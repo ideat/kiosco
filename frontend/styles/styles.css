@@ -1,0 +1,15 @@
+.button-font{
+    font-size: 24pt;
+}
+
+.button-font-trf{
+    font-size: 24pt;
+    color: white;
+    background-color: midnightblue;
+    width: 20%;
+    height: 80px;
+}
+
+.title-header{
+    color: midnightblue;
+}

@@ -1,9 +1,8 @@
 {
-  "name": "no-name",
-  "license": "UNLICENSED",
   "dependencies": {
     "@polymer/iron-icon": "3.0.1",
     "@polymer/iron-list": "3.1.0",
+    "@polymer/paper-menu-button": "3.0.1",
     "@polymer/polymer": "3.2.0",
     "@vaadin/vaadin-accordion": "1.2.0",
     "@vaadin/vaadin-app-layout": "2.2.0",
@@ -47,8 +46,10 @@
     "@vaadin/vaadin-upload": "4.4.1",
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "construct-style-sheets-polyfill": "2.4.16",
+    "line-awesome": "1.3.0",
     "lit-element": "2.5.1",
-    "lit-html": "1.4.1"
+    "lit-html": "1.4.1",
+    "lumo-css-framework": "^4.0.10"
   },
   "devDependencies": {
     "chokidar": "^3.5.0",
@@ -69,10 +70,13 @@
     "webpack-dev-server": "3.11.0",
     "webpack-merge": "4.2.2"
   },
+  "license": "UNLICENSED",
+  "name": "no-name",
   "vaadin": {
     "dependencies": {
       "@polymer/iron-icon": "3.0.1",
       "@polymer/iron-list": "3.1.0",
+      "@polymer/paper-menu-button": "3.0.1",
       "@polymer/polymer": "3.2.0",
       "@vaadin/vaadin-accordion": "1.2.0",
       "@vaadin/vaadin-app-layout": "2.2.0",
@@ -116,8 +120,10 @@
       "@vaadin/vaadin-upload": "4.4.1",
       "@webcomponents/webcomponentsjs": "^2.2.10",
       "construct-style-sheets-polyfill": "2.4.16",
+      "line-awesome": "1.3.0",
       "lit-element": "2.5.1",
-      "lit-html": "1.4.1"
+      "lit-html": "1.4.1",
+      "lumo-css-framework": "^4.0.10"
     },
     "devDependencies": {
       "chokidar": "^3.5.0",
@@ -138,6 +144,6 @@
       "webpack-dev-server": "3.11.0",
       "webpack-merge": "4.2.2"
     },
-    "hash": "7821783dbe9f953d0cb772dbb63c27d2824689bc59bc683dff8c7cee4947fe8c"
+    "hash": "4b3064147025a6ab18abc640935a5aa559b421f6bbdc8197698d270085ea7c42"
   }
 }
