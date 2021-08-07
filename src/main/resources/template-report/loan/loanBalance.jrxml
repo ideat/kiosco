@@ -194,7 +194,7 @@
 				<text><![CDATA[Plazo      :]]></text>
 			</staticText>
 			<textField pattern="#,##0.00;(#,##0.00)">
-				<reportElement x="412" y="90" width="70" height="12" uuid="5d7ae57f-dc60-4cfe-a1c0-d68b73c8b020">
+				<reportElement x="412" y="90" width="48" height="12" uuid="5d7ae57f-dc60-4cfe-a1c0-d68b73c8b020">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right">
@@ -274,7 +274,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center"/>
-				<textFieldExpression><![CDATA[$F{currency}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{currency}.equals("Bs.")?"BOLIVIANOS":"DOLARES"]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>

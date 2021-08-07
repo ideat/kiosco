@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class DetailTransaction {
+public class DetailTransactionLoan {
 
     private Integer prtdtntra;
 

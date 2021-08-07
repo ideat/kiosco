@@ -1,12 +1,12 @@
 package com.example.application.backend.service.loan;
 
-import com.example.application.backend.entity.loan.DetailTransaction;
+import com.example.application.backend.entity.loan.DetailTransactionLoan;
 import com.example.application.backend.entity.loan.HeaderBalanceLoan;
 import com.example.application.backend.entity.loan.MasterTransaction;
 import com.example.application.backend.entity.loan.ToDiffer;
 import com.example.application.backend.entity.loan.dto.BalanceLoanDto;
 import com.example.application.backend.entity.loan.dto.DetailTransactionDto;
-import com.example.application.backend.repository.loan.DetailTransactionMapper;
+import com.example.application.backend.repository.loan.DetailTransactionLoanMapper;
 import com.example.application.backend.repository.loan.HeaderBalanceLoanMapper;
 import com.example.application.backend.repository.loan.MasterTransactionMapper;
 import com.example.application.backend.repository.loan.ToDifferMapper;
@@ -29,7 +29,7 @@ public class BalanceLoanService {
     MasterTransactionMapper masterTransactionMapper;
 
     @Autowired
-    DetailTransactionMapper detailTransactionMapper;
+    DetailTransactionLoanMapper detailTransactionLoanMapper;
 
     @Autowired
     ToDifferMapper toDifferMapper;
@@ -38,50 +38,56 @@ public class BalanceLoanService {
 
         HeaderBalanceLoan headerBalanceLoan = headerBalanceLoanMapper.getHeaderLoan(loanNumber);
         List<MasterTransaction> masterTransactionList = masterTransactionMapper.findMasterTransactionByLoanNumber(loanNumber);
-        List<DetailTransaction> detailTransactionList = detailTransactionMapper.findDetailTransactionByLoanNumber(loanNumber);
+        List<DetailTransactionLoan> detailTransactionLoanList = detailTransactionLoanMapper.findDetailTransactionByLoanNumber(loanNumber);
         List<ToDiffer> toDifferList = toDifferMapper.findByLoanNumber(loanNumber);
 
         List<DetailTransactionDto> detailTransactionDtoList = new ArrayList<>();
         Date initialDate = headerBalanceLoan.getPrmprfdes();
         Double balance = 0.0;
         for(MasterTransaction m:masterTransactionList){
-            List<DetailTransaction> auxDetail = detailTransactionList.stream()
+
+            List<DetailTransactionLoan> auxDetail = detailTransactionLoanList.stream()
                     .filter(f -> f.getPrtdtntra().equals(m.getPrhtrntra()))
                     .collect(Collectors.toList());
             DetailTransactionDto detailTransactionDto = new DetailTransactionDto();
 
             Double capital = auxDetail.stream()
-                    .filter(f -> f.getPrtdtccon().equals(1))
-                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
+                    .filter(f ->  f.getPrtdtpref().equals(20) && f.getPrtdtccon().equals(1) ||
+                            (f.getPrtdtpref().equals(21) && (f.getPrtdtccon().equals(420) || f.getPrtdtccon().equals(421) ||
+                                    f.getPrtdtccon().equals(424) || f.getPrtdtccon().equals(425))))
+                    .mapToDouble(DetailTransactionLoan::getPrtdtimpp).sum();
             Double interest = auxDetail.stream()
-                    .filter(f -> f.getPrtdtccon().equals(2))
-                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
+                    .filter(f -> f.getPrtdtpref().equals(20) && f.getPrtdtccon().equals(2) ||
+                            (f.getPrtdtpref().equals(21) && (f.getPrtdtccon().equals(422) || f.getPrtdtccon().equals(423) ||
+                                    f.getPrtdtccon().equals(426) || f.getPrtdtccon().equals(427))))
+                    .mapToDouble(DetailTransactionLoan::getPrtdtimpp).sum();
             Double penal = auxDetail.stream()
                     .filter(f -> f.getPrtdtccon().intValue()>=44 && f.getPrtdtccon().intValue()<=55)
-                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
+                    .mapToDouble(DetailTransactionLoan::getPrtdtimpp).sum();
             Double form1 = auxDetail.stream()
                     .filter(f -> f.getPrtdtttrn().equals(1) && f.getPrtdtccon().intValue()>=56 && f.getPrtdtccon().intValue()<=59)
-                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
+                    .mapToDouble(DetailTransactionLoan::getPrtdtimpp).sum();
             Double secure =  auxDetail.stream()
                     .filter(f -> f.getPrtdtpref().equals(21) && f.getPrtdtttrn().equals(2) &&
                             (f.getPrtdtccon().intValue()>=26 && f.getPrtdtccon().intValue()<=28) ||
                             (f.getPrtdtccon().intValue()>=31 && f.getPrtdtccon().intValue()<=33))
-                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
+                    .mapToDouble(DetailTransactionLoan::getPrtdtimpp).sum();
             Double judic = auxDetail.stream()
-                    .filter(f -> f.getPrtdtpref().equals(21) && f.getPrtdtttrn().equals(2) && f.getPrtdtccon().intValue()>=21 && f.getPrtdtccon().intValue()<=25)
-                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
+                    .filter(f -> f.getPrtdtpref().equals(21) && f.getPrtdtttrn().equals(2) && f.getPrtdtccon().intValue()>=21 &&
+                            f.getPrtdtccon().intValue()<=25)
+                    .mapToDouble(DetailTransactionLoan::getPrtdtimpp).sum();
 
             Long days = Duration.between(initialDate.toInstant(), auxDetail.get(0).getPrtdtftra().toInstant()).toDays();
 
-            Double auxBalance = auxDetail.stream()
-                    .filter(f -> f.getPrtdtpref().equals(20) && f.getPrtdtccon().equals(1) )
-                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
+//            Double auxBalance = auxDetail.stream()
+//                    .filter(f -> f.getPrtdtpref().equals(20) && f.getPrtdtccon().equals(1) )
+//                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
 
             Double auxOther = auxDetail.stream()
                     .filter(f -> f.getPrtdtpref().equals(21) && (f.getPrtdtccon().equals(428) || f.getPrtdtccon().equals(429)))
-                    .mapToDouble(DetailTransaction::getPrtdtimpp).sum();
+                    .mapToDouble(DetailTransactionLoan::getPrtdtimpp).sum();
 
-            balance = auxBalance + balance;
+            balance = capital + balance;
 
             detailTransactionDto.setPaymentDate(m.getPrhtrftra());
             detailTransactionDto.setTransactionNumber(m.getPrhtrntra());

@@ -1,5 +1,9 @@
 package com.example.application.views.savingbank;
 
+import com.example.application.backend.entity.savingBank.dto.BalanceSavingBankDto;
+import com.example.application.backend.service.savingBank.BalanceSavingBankDtoService;
+import com.example.application.views.report.FormReportView;
+import com.example.application.views.util.PrinterReportJasper;
 import com.vaadin.componentfactory.EnhancedDatePicker;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -15,10 +19,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.theme.lumo.Lumo;
+import net.sf.jasperreports.engine.JRException;
+import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Locale;
+import java.time.ZoneId;
+import java.util.*;
 
 @CssImport("./styles/my-dialog.css")
 public class DiaglogExtract extends Dialog {
@@ -35,12 +44,16 @@ public class DiaglogExtract extends Dialog {
     private VerticalLayout content;
     public Footer footer;
 
-    public DiaglogExtract(){
+    private BalanceSavingBankDtoService service;
+    private String accountGlobal;
+
+    public DiaglogExtract(String account, BalanceSavingBankDtoService balanceSavingBankDtoService){
         setDraggable(true);
         setModal(false);
         setResizable(true);
 
-
+        service = balanceSavingBankDtoService;
+        accountGlobal = account;
         // Dialog theming
         getElement().getThemeList().add("my-dialog");
         setWidth("800px");
@@ -168,10 +181,77 @@ public class DiaglogExtract extends Dialog {
                startDate.setInvalid(true);
                return;
            }
+           Optional<Date> initDateOptional = Optional.empty();
+           initDateOptional = Optional.of(Date.from(startDate.getValue().atStartOfDay()
+                   .atZone(ZoneId.systemDefault())
+                   .toInstant()));
+           Optional<Date> endDateOptional = Optional.empty();
+            endDateOptional = Optional.of(Date.from(endDate.getValue().atStartOfDay()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()));
 
+           List<BalanceSavingBankDto> collection = new ArrayList<>();
+           BalanceSavingBankDto balanceSavingBankDto = service.getBalanceSavingBank(accountGlobal,initDateOptional,endDateOptional,Optional.empty());
+           collection.add(balanceSavingBankDto);
 
+            InputStream stream = getClass().getResourceAsStream("/template-report/savingBank/savingBankBalance.jrxml");
+            String pathLogo =  getClass().getResource("/template-report/img/logo.png").getPath();
+            String pathSubreport ="template-report/savingBank/";
+            Map<String,Object> params = new WeakHashMap<>();
+            params.put("logo",pathLogo);
+            params.put("path_subreport", pathSubreport);
+
+            byte[] b = new byte[0];
+            try {
+                b = PrinterReportJasper.imprimirComoPdf(stream,collection,params);
+            } catch (JRException e) {
+                e.printStackTrace();
+            }
+            InputStream is = new ByteArrayInputStream(b);
+            try {
+                byte[] p = IOUtils.toByteArray(is);
+                FormReportView contentReport = new FormReportView("EXTRACTO", p);
+                contentReport.open();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
+        btnPrint2.addClickListener(click -> {
+            if(lastMovement.isInvalid()){
+                lastMovement.setErrorMessage("Numero de movimientos no valido");
+                lastMovement.setInvalid(true);
+                return;
+            }
+            Optional<Integer> lastMovementOptional = Optional.of(lastMovement.getValue().intValue());
+
+            List<BalanceSavingBankDto> collection = new ArrayList<>();
+            BalanceSavingBankDto balanceSavingBankDto = service.getBalanceSavingBank(accountGlobal,Optional.empty(),Optional.empty(),lastMovementOptional);
+            collection.add(balanceSavingBankDto);
+
+            InputStream stream = getClass().getResourceAsStream("/template-report/savingBank/savingBankBalance.jrxml");
+            String pathLogo =  getClass().getResource("/template-report/img/logo.png").getPath();
+            String pathSubreport ="template-report/savingBank/";
+            Map<String,Object> params = new WeakHashMap<>();
+            params.put("logo",pathLogo);
+            params.put("path_subreport", pathSubreport);
+
+            byte[] b = new byte[0];
+            try {
+                b = PrinterReportJasper.imprimirComoPdf(stream,collection,params);
+            } catch (JRException e) {
+                e.printStackTrace();
+            }
+            InputStream is = new ByteArrayInputStream(b);
+            try {
+                byte[] p = IOUtils.toByteArray(is);
+                FormReportView contentReport = new FormReportView("EXTRACTO", p);
+                contentReport.open();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        });
 
         return mainLayout;
     }

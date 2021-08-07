@@ -2,6 +2,7 @@ package com.example.application.views.savingbank;
 
 
 import com.example.application.backend.entity.savingBank.SavingBankClient;
+import com.example.application.backend.service.savingBank.BalanceSavingBankDtoService;
 import com.example.application.backend.service.savingBank.SavingBankService;
 import com.example.application.views.util.UIUtils;
 import com.vaadin.flow.component.button.Button;
@@ -25,6 +26,9 @@ import java.util.List;
 public class SavingBankView {
     @Autowired
     private SavingBankService savingBankService;
+
+    @Autowired
+    private BalanceSavingBankDtoService balanceSavingBankDtoService;
 
     private List<SavingBankClient> savingBankClientList;
 
@@ -74,6 +78,10 @@ public class SavingBankView {
                 .setHeader("Numero de Cuenta")
                 .setFlexGrow(0)
                 .setAutoWidth(true);
+        grid.addColumn(SavingBankClient::getState)
+                .setHeader("Estado")
+                .setFlexGrow(0)
+                .setAutoWidth(true);
         grid.addColumn(SavingBankClient::getCurrency)
                 .setHeader("Moneda")
                 .setFlexGrow(0)
@@ -111,7 +119,7 @@ public class SavingBankView {
         layout.setSpacing(true);
 
         btnSavingBank.addClickListener(click -> {
-           DiaglogExtract diaglogExtract = new DiaglogExtract();
+           DiaglogExtract diaglogExtract = new DiaglogExtract(savingBankClient.getAccount(), balanceSavingBankDtoService);
            diaglogExtract.open();
         });
 

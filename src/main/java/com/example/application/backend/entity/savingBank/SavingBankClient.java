@@ -13,4 +13,6 @@ public class SavingBankClient {
     private String productName;
 
     private Double balance;
+
+    private String state;
 }
