@@ -1,20 +1,33 @@
 package com.example.application.views.dpf;
 
 import com.example.application.backend.entity.dpf.DpfAccounts;
+import com.example.application.backend.entity.dpf.dto.BalanceDpfDto;
+import com.example.application.backend.service.dpf.BalanceDpfService;
 import com.example.application.backend.service.dpf.DpfAccountService;
+import com.example.application.views.report.FormReportView;
+import com.example.application.views.util.PrinterReportJasper;
 import com.example.application.views.util.UIUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import net.sf.jasperreports.engine.JRException;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 @Component
 public class DpfView {
@@ -22,10 +35,13 @@ public class DpfView {
     @Autowired
     private DpfAccountService dpfAccountService;
 
+    @Autowired
+    private BalanceDpfService balanceDpfService;
+
     private List<DpfAccounts> dpfAccountsList;
 
-    public HorizontalLayout getLayoutDpfAccount(Integer codeClient){
-        HorizontalLayout layout = new HorizontalLayout();
+    public VerticalLayout getLayoutDpfAccount(Integer codeClient){
+        VerticalLayout layout = new VerticalLayout();
 
         Button btnTariff = new Button("Tarifario");
         btnTariff.addClassName("button-font-trf");
@@ -33,11 +49,27 @@ public class DpfView {
 
         });
 
-        dpfAccountsList = dpfAccountService.getDpfsByClient(codeClient);
+        Button btnSimulation = new Button("Simulación");
+        btnSimulation.addClassName("button-font-trf");
+        btnSimulation.addClickListener(click ->{
+            DialogSimulation dialogSimulation = new DialogSimulation();
+            dialogSimulation.open();
+        });
 
-        layout.add(createDpfAccountClient(), btnTariff);
+        HorizontalLayout header = new HorizontalLayout();
+        header.add(btnTariff, btnSimulation);
+        header.setSpacing(true);
+//        header.setAlignContent(FlexLayout.ContentAlignment.SPACE_AROUND);
+//        header.setFlexDirection(FlexLayout.FlexDirection.ROW);
+        header.setWidthFull();
+
+
+        dpfAccountsList = dpfAccountService.getDpfsByClient(codeClient);
+        layout.add(header,createDpfAccountClient());
+
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setSpacing(true);
-        layout.setWidthFull();
+        layout.setWidth("70%");
 
 
         return layout;
@@ -88,6 +120,31 @@ public class DpfView {
         btnStateDpf.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         btnStateDpf.addClickListener(click ->{
+            List<BalanceDpfDto> collection = new ArrayList<>();
+            BalanceDpfDto balanceDpfDto = balanceDpfService.getBalanceDpf(dpfAccounts.getNumberDpf());
+            collection.add(balanceDpfDto);
+
+            InputStream stream = getClass().getResourceAsStream("/template-report/dpf/dpfBalance.jrxml");
+            String pathLogo =  getClass().getResource("/template-report/img/logo.png").getPath();
+            String pathSubreport ="template-report/dpf/";
+            Map<String,Object> params = new WeakHashMap<>();
+            params.put("logo",pathLogo);
+            params.put("path_subreport", pathSubreport);
+
+            byte[] b = new byte[0];
+            try {
+                b = PrinterReportJasper.imprimirComoPdf(stream,collection,params);
+            } catch (JRException e) {
+                e.printStackTrace();
+            }
+            InputStream is = new ByteArrayInputStream(b);
+            try {
+                byte[] p = IOUtils.toByteArray(is);
+                FormReportView contentReport = new FormReportView("EXTRACTO", p);
+                contentReport.open();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         });
 

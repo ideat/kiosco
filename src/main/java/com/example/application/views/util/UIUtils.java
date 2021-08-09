@@ -1,5 +1,6 @@
 package com.example.application.views.util;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Label;
 
 import java.text.DecimalFormat;
@@ -19,6 +20,13 @@ public class UIUtils {
         Label label = new Label(text);
         label.addClassName(LumoStyles.Heading.H5);
         return label;
+    }
+
+    public static void setColSpan(int span, Component... components) {
+        for (Component component : components) {
+            component.getElement().setAttribute("colspan",
+                    Integer.toString(span));
+        }
     }
 
     public static String formatAmount(Double amount) {

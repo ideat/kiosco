@@ -15,4 +15,6 @@ public class SavingBankClient {
     private Double balance;
 
     private String state;
+
+    private Double rate;
 }

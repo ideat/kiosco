@@ -110,12 +110,13 @@ public class SavingBankView {
         Button btnSavingBank = new Button("Extracto");
         btnSavingBank.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        Button btnBalance = new Button("Saldo");
-        btnBalance.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_PRIMARY);
-        btnBalance.setIcon(VaadinIcon.PRINT.create());
+//        Button btnBalance = new Button("Saldo");
+//        btnBalance.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_PRIMARY);
+//        btnBalance.setIcon(VaadinIcon.PRINT.create());
 
         HorizontalLayout layout = new HorizontalLayout();
-        layout.add(btnBalance,btnSavingBank);
+//        layout.add(btnBalance,btnSavingBank);
+        layout.add(btnSavingBank);
         layout.setSpacing(true);
 
         btnSavingBank.addClickListener(click -> {
@@ -123,9 +124,9 @@ public class SavingBankView {
            diaglogExtract.open();
         });
 
-        btnBalance.addClickListener(click -> {
-
-        });
+//        btnBalance.addClickListener(click -> {
+//
+//        });
 
         return layout;
     }

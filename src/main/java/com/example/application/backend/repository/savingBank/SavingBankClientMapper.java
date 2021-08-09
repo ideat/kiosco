@@ -21,4 +21,14 @@ public interface SavingBankClientMapper {
     List<SavingBankClient> getSavingBanksClient(@Param("codeClient") Integer codeClient);
 
 
+    @Select(" select gbagenomb full_name, camcancta account, catcadesc product_name, " +
+            " gbconabre currency, (camcasact)*-1 balance, cacondesc state " +
+            " from camca " +
+            " inner join gbage on gbagecage = camcacage " +
+            " inner join catca on catcatpca = camcatpca " +
+            " inner join gbcon on gbconpfij = 5 and gbconcorr = camcacmon " +
+            " inner join cacon on caconpref = 4 and caconcorr = camcastat" +
+            " where camcacage = #{codeClient} " +
+            " and camcastat in (1,2) ")
+    List<SavingBankClient> getSavingBanksClient2(@Param("codeClient") Integer codeClient);
 }

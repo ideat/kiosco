@@ -52,7 +52,8 @@ public class MainView extends FlexLayout implements RouterLayout, HasUrlParamete
 
 
     public MainView() {
-       
+
+       this.getElement().getStyle().set("background-image","url('background.jpg')");
     }
 
     @Override
@@ -81,7 +82,7 @@ public class MainView extends FlexLayout implements RouterLayout, HasUrlParamete
 
         //Layout DPF
         Div layoutDpf = createSimpleDiv(4);
-        layoutDpf.add(dpfView.getLayoutDpfAccount(26907));
+        layoutDpf.add(dpfView.getLayoutDpfAccount(3155));
 
         //Layout Loan
         Div layoutLoan = createSimpleDiv(4);

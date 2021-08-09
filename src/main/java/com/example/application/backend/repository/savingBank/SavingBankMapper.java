@@ -109,7 +109,7 @@ public interface SavingBankMapper {
                                                              @Param("initDate") Date initDate,
                                                              @Param("endtDate") Date endtDate);
 
-    @Select("select first(#{movement}) b.camcancta account,c.catrnftra transaction_date,c.catrnhora transaction_time,c.catrnagen agency, " +
+    @Select("select b.camcancta account,c.catrnftra transaction_date,c.catrnhora transaction_time,c.catrnagen agency, " +
             "d.catmvdesc description, " +
             "round(decode(c.catrnimpo,(select e.catrnimpo " +
             "      from catrn e " +
@@ -153,7 +153,8 @@ public interface SavingBankMapper {
             " and c.catrncorr=d.catmvcorr " +
             " and b.camcancta= #{account} "+
             " and c.catrnstat=0" +
-            " order by 2,3 desc ")
+            " order by 2,3 desc " +
+            " limit #{movement}")
     List<SavingBankBalance> getSavingBankBalanceLastNMovement(@Param("account") String account,
                                                               @Param("movement") Integer movement);
 
