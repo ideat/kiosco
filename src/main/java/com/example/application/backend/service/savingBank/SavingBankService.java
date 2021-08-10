@@ -21,6 +21,7 @@ public class SavingBankService {
     @Autowired
     SavingBankClientMapper saveBankClientMapper;
 
+
     public List<SavingBankBalance> getSavingBankBalanceFull(String account){
         List<SavingBankBalance> savingBankBalanceList = savingBankMapper.getSavingBankBalance(account);
         List<SavingBankBalance> auxList = new ArrayList<>();
@@ -69,6 +70,9 @@ public class SavingBankService {
     public List<SavingBankClient> getSavingBankClient(Integer codeClient){
         List<SavingBankClient> savingBankClientList = saveBankClientMapper.getSavingBanksClient(codeClient);
 
+        for(SavingBankClient s: savingBankClientList){
+
+        }
         return savingBankClientList;
     }
 }

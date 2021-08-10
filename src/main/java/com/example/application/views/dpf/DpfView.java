@@ -2,20 +2,25 @@ package com.example.application.views.dpf;
 
 import com.example.application.backend.entity.dpf.DpfAccounts;
 import com.example.application.backend.entity.dpf.dto.BalanceDpfDto;
+import com.example.application.backend.entity.dpf.dto.ProductRateTermAmount;
 import com.example.application.backend.service.dpf.BalanceDpfService;
 import com.example.application.backend.service.dpf.DpfAccountService;
+import com.example.application.backend.service.dpf.ProductRateTermAmountService;
 import com.example.application.views.report.FormReportView;
 import com.example.application.views.util.PrinterReportJasper;
 import com.example.application.views.util.UIUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import net.sf.jasperreports.engine.JRException;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +44,15 @@ public class DpfView {
     @Autowired
     private BalanceDpfService balanceDpfService;
 
+    @Autowired
+    private ProductRateTermAmountService productRateTermAmountService;
+
     private List<DpfAccounts> dpfAccountsList;
 
     public VerticalLayout getLayoutDpfAccount(Integer codeClient){
         VerticalLayout layout = new VerticalLayout();
+
+        List<ProductRateTermAmount> listParams = productRateTermAmountService.findAll();
 
         Button btnTariff = new Button("Tarifario");
         btnTariff.addClassName("button-font-trf");
@@ -52,7 +63,7 @@ public class DpfView {
         Button btnSimulation = new Button("Simulación");
         btnSimulation.addClassName("button-font-trf");
         btnSimulation.addClickListener(click ->{
-            DialogSimulation dialogSimulation = new DialogSimulation();
+            DialogSimulation dialogSimulation = new DialogSimulation(listParams);
             dialogSimulation.open();
         });
 
@@ -69,7 +80,7 @@ public class DpfView {
 
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setSpacing(true);
-        layout.setWidth("70%");
+        layout.setWidthFull();
 
 
         return layout;
@@ -82,22 +93,35 @@ public class DpfView {
         title.addClassName("title-header");
 
         Grid<DpfAccounts> grid = new Grid<>();
+        grid.addThemeVariants(GridVariant.LUMO_COMPACT);
 
         grid.setItems(dpfAccountsList);
         grid.addColumn(DpfAccounts::getNumberDpf)
                 .setHeader("Numero de DPF")
                 .setFlexGrow(0)
                 .setAutoWidth(true);
+        grid.addColumn(DpfAccounts::getProduct)
+                .setHeader("Producto")
+                .setFlexGrow(0)
+                .setAutoWidth(true);
+        grid.addColumn(DpfAccounts::getRate)
+                .setHeader("Tasa")
+                .setFlexGrow(0)
+                .setAutoWidth(true);
+        grid.addColumn(new LocalDateRenderer<>(DpfAccounts::getExpiredDateConvert, DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                .setHeader("Fecha vencimiento")
+                .setFlexGrow(0)
+                .setAutoWidth(true);
         grid.addColumn(DpfAccounts::getCurrency)
                 .setHeader("Moneda")
                 .setFlexGrow(0)
                 .setAutoWidth(true);
-        grid.addColumn(DpfAccounts::getTerm)
-                .setHeader("Plazo(dias)")
-                .setFlexGrow(0)
-                .setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createAmount))
                 .setHeader("Capital")
+                .setFlexGrow(0)
+                .setAutoWidth(true);
+        grid.addColumn(DpfAccounts::getTerm)
+                .setHeader("Plazo(dias)")
                 .setFlexGrow(0)
                 .setAutoWidth(true);
         grid.addColumn(new ComponentRenderer<>(this::createButtonState))

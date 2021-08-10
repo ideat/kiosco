@@ -2,9 +2,11 @@ package com.example.application.views.loan;
 
 import com.example.application.backend.entity.loan.LoanAccounts;
 import com.example.application.backend.entity.loan.dto.BalanceLoanDto;
+import com.example.application.backend.entity.loan.dto.PaymentPlanDto;
 import com.example.application.backend.entity.savingBank.SavingBankClient;
 import com.example.application.backend.service.loan.BalanceLoanService;
 import com.example.application.backend.service.loan.LoanAccountsService;
+import com.example.application.backend.service.loan.PaymentPlanService;
 import com.example.application.views.report.FormReportView;
 import com.example.application.views.util.PrinterReportJasper;
 import com.example.application.views.util.UIUtils;
@@ -39,6 +41,9 @@ public class LoanView {
 
     @Autowired
     private BalanceLoanService balanceLoanService;
+
+    @Autowired
+    private PaymentPlanService paymentPlanService;
 
     private List<LoanAccounts> loanAccountsList;
 
@@ -132,6 +137,34 @@ public class LoanView {
             }
 
 
+        });
+
+        btnPaymentPlan.addClickListener(click -> {
+           List<PaymentPlanDto> collection = new ArrayList<>();
+            PaymentPlanDto paymentPlanDto = paymentPlanService.getPaymentPlan(loanAccounts.getNumberLoan());
+            collection.add(paymentPlanDto);
+
+            InputStream stream = getClass().getResourceAsStream("/template-report/loan/paymentPlan.jrxml");
+            String pathLogo =  getClass().getResource("/template-report/img/logo.png").getPath();
+            String pathSubreport ="template-report/loan/";
+            Map<String,Object> params = new WeakHashMap<>();
+            params.put("logo",pathLogo);
+            params.put("path_subreport", pathSubreport);
+
+            byte[] b = new byte[0];
+            try {
+                b = PrinterReportJasper.imprimirComoPdf(stream,collection,params);
+            } catch (JRException e) {
+                e.printStackTrace();
+            }
+            InputStream is = new ByteArrayInputStream(b);
+            try {
+                byte[] p = IOUtils.toByteArray(is);
+                FormReportView contentReport = new FormReportView("EXTRACTO", p);
+                contentReport.open();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
         HorizontalLayout layout = new HorizontalLayout();

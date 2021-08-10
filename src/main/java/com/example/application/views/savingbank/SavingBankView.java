@@ -78,6 +78,14 @@ public class SavingBankView {
                 .setHeader("Numero de Cuenta")
                 .setFlexGrow(0)
                 .setAutoWidth(true);
+        grid.addColumn(SavingBankClient::getProductName)
+                .setHeader("Producto")
+                .setFlexGrow(0)
+                .setAutoWidth(true);
+        grid.addColumn(SavingBankClient::getRate)
+                .setHeader("Tasa")
+                .setFlexGrow(0)
+                .setAutoWidth(true);
         grid.addColumn(SavingBankClient::getState)
                 .setHeader("Estado")
                 .setFlexGrow(0)

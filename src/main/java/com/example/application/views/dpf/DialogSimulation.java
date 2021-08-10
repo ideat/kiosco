@@ -1,5 +1,6 @@
 package com.example.application.views.dpf;
 
+import com.example.application.backend.entity.dpf.dto.ProductRateTermAmount;
 import com.example.application.views.util.UIUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,6 +19,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.theme.lumo.Lumo;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 @CssImport("./styles/my-dialog.css")
 public class DialogSimulation extends Dialog {
 
@@ -35,12 +39,15 @@ public class DialogSimulation extends Dialog {
     public Footer footer;
 
     private VerticalLayout layoutResult;
+    private List<ProductRateTermAmount> productRateTermAmountList;
 
-    public DialogSimulation(){
+
+    public DialogSimulation(List<ProductRateTermAmount> listParams){
 
         setDraggable(true);
         setModal(false);
         setResizable(true);
+        productRateTermAmountList = listParams;
 
         layoutResult = new VerticalLayout();
 
@@ -90,10 +97,14 @@ public class DialogSimulation extends Dialog {
 
     private VerticalLayout layoutSimulation(){
 
-        ComboBox<String> cmbProduct = new ComboBox<>();
-        cmbProduct.setRequired(true);
-        cmbProduct.setItems("Tarifario DPF");
-        cmbProduct.setWidthFull();
+//        ComboBox<String> cmbProduct = new ComboBox<>();
+//        cmbProduct.setRequired(true);
+//        cmbProduct.setItems("Tarifario DPF");
+//        cmbProduct.setWidthFull();
+        List<Integer> termSet = new ArrayList<> (new HashSet<> (productRateTermAmountList.stream()
+                .map(ProductRateTermAmount::getEndTerm)
+                .collect(Collectors.toList())));
+        termSet.sort(Comparator.naturalOrder());
 
         NumberField amount = new NumberField();
         amount.setMin(100.0);
@@ -110,25 +121,30 @@ public class DialogSimulation extends Dialog {
         cmbCurrency.setValue("Bolivianos");
         cmbCurrency.setWidthFull();
 
-        NumberField term = new NumberField();
-        term.setMin(30.0);
-        term.setMax(7200.0);
-        term.setValue(30.0);
-        term.setClearButtonVisible(true);
-        term.setHasControls(true);
-        term.setRequiredIndicatorVisible(true);
+//        NumberField term = new NumberField();
+//        term.setMin(30.0);
+//        term.setMax(1800.0);
+//        term.setValue(30.0);
+//        term.setClearButtonVisible(true);
+//        term.setHasControls(true);
+//        term.setRequiredIndicatorVisible(true);
+//        term.setWidthFull();
+        ComboBox<Integer> term = new ComboBox<>();
+        term.setItems(termSet);
         term.setWidthFull();
+        term.setRequired(true);
+        term.setPlaceholder("Seleccione Plazo");
 
         FormLayout formLayout = new FormLayout();
 
 
-        HorizontalLayout layoutProduct = new HorizontalLayout();
-        layoutProduct.setWidthFull();
-        layoutProduct.add(cmbProduct);
-        layoutProduct.setAlignItems(FlexComponent.Alignment.CENTER);
-        FormLayout.FormItem productItem =   formLayout.addFormItem(layoutProduct,"Elije tu DPF:");
+//        HorizontalLayout layoutProduct = new HorizontalLayout();
+//        layoutProduct.setWidthFull();
+//        layoutProduct.add(cmbProduct);
+//        layoutProduct.setAlignItems(FlexComponent.Alignment.CENTER);
+//        FormLayout.FormItem productItem =   formLayout.addFormItem(layoutProduct,"Elije tu DPF:");
 
-        UIUtils.setColSpan(2,productItem);
+//        UIUtils.setColSpan(2,productItem);
 
         HorizontalLayout layoutAmount = new HorizontalLayout();
         layoutAmount.setSpacing(true);
@@ -155,7 +171,7 @@ public class DialogSimulation extends Dialog {
             if(layoutResult.isVisible()){
                 layoutResult.removeAll();
             }
-            resultLayout(amount.getValue(),5.15, term.getValue().intValue(),cmbCurrency.getValue());
+            resultLayout(amount.getValue(), term.getValue().intValue(),cmbCurrency.getValue());
             layoutResult.setVisible(true);
         });
 
@@ -165,12 +181,24 @@ public class DialogSimulation extends Dialog {
 
     }
 
-    private void resultLayout(Double amount, Double rate, Integer term, String currency){
+    private void resultLayout(Double amount,  Integer term, String currency){
+
+
+        Integer cur = currency.equals("Bolivianos")?1:2;
+        List<ProductRateTermAmount> result = productRateTermAmountList.stream()
+                .filter(f -> amount.doubleValue() >= f.getInitAmount().doubleValue() &&
+                        amount.doubleValue() <=  f.getEndAmount().doubleValue() &&
+                        f.getCurrency().equals(cur) &&
+                        term.intValue() >= f.getInitTerm().intValue() &&
+                        term.intValue() <=  f.getEndTerm().intValue())
+                .collect(Collectors.toList());
+
+        Double rate = result.get(0).getRate();
         Double totalInterest = (amount * rate) / 36000 * term;
         Double total = amount + totalInterest;
 
         H3 labelInterest = new H3();
-        labelInterest.setText("Interés ganado:");
+        labelInterest.setText("Interés ganado ->Tasa:" + rate.toString() + "%");
 
         H3 labelResult = new H3();
         labelResult.setText("Monto Final (Cap. + Int.):");

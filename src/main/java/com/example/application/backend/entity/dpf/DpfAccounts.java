@@ -2,6 +2,8 @@ package com.example.application.backend.entity.dpf;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Data
@@ -26,5 +28,14 @@ public class DpfAccounts {
 
     private Double amount;
 
+    private Double rate;
+
+    private String product;
+
+    public LocalDate getExpiredDateConvert(){
+        return expireDate.toInstant()
+                .atZone(ZoneId.of("UTC"))
+                .toLocalDate();
+    }
 
 }
