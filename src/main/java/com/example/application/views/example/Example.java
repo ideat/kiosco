@@ -80,7 +80,7 @@ public class Example extends FlexLayout {
                         carousel.add(image);
                         break;
                     case Form:
-                        carousel.add(createGrid());
+                        carousel.add(createLoginForm());
                         break;
                     default:
                         break;

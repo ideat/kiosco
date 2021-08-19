@@ -7,13 +7,19 @@ import java.util.Date;
 @Data
 public class DeferredPaymentPlanDto {
 
-    private Date registerDate;
+    private Integer secuence;
 
-    private Date paymentDate;
+    private Date deferredDate;
+
+    private Date expireDate;
 
     private Double principal;
 
     private Double interest;
+
+    private Double charge;
+
+    private Double fee;
 
     private Double total;
 

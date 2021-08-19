@@ -15,11 +15,7 @@ public class DetailPaymentPlanDto {
 
     private Double interest;
 
-    private Double general;
-
-    private Double secure;
-
-    private Double other;
+    private Double fee;
 
     private Double charge;
 

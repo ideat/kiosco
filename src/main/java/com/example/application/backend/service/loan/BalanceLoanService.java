@@ -76,8 +76,9 @@ public class BalanceLoanService {
                     .filter(f -> f.getPrtdtpref().equals(21) && f.getPrtdtttrn().equals(2) && f.getPrtdtccon().intValue()>=21 &&
                             f.getPrtdtccon().intValue()<=25)
                     .mapToDouble(DetailTransactionLoan::getPrtdtimpp).sum();
+            Long days = 0l;
 
-            Long days = Duration.between(initialDate.toInstant(), auxDetail.get(0).getPrtdtftra().toInstant()).toDays();
+            days = Duration.between(initialDate.toInstant(), auxDetail.get(0).getPrtdtftra().toInstant()).toDays();
 
 //            Double auxBalance = auxDetail.stream()
 //                    .filter(f -> f.getPrtdtpref().equals(20) && f.getPrtdtccon().equals(1) )

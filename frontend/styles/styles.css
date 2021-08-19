@@ -11,9 +11,14 @@
 }
 
 .title-header{
-    color: midnightblue;
-}
+    color: #0D416C;
+    font-family: "HoloLens MDL2 Assets";
 
+}
+.text-color{
+    color: midnightblue;
+
+}
 /*.backgroundimage {*/
 /*    background: url("frontend/styles/background.jpg") !important;*/
 /*}*/

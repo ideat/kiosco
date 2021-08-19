@@ -2,6 +2,10 @@ package com.example.application.backend.entity.loan;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+
 @Data
 public class LoanAccounts {
 
@@ -16,4 +20,14 @@ public class LoanAccounts {
     private String nameProduct;
 
     private String state;
+
+    private Double rate;
+
+    private Date expiredDate;
+
+    public LocalDate getExpiredDateConvert(){
+        return expiredDate.toInstant()
+                .atZone(ZoneId.of("UTC"))
+                .toLocalDate();
+    }
 }

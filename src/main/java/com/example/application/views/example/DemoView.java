@@ -21,7 +21,7 @@ import org.vaadin.erik.SlideTabPosition;
 
 @CssImport("./styles/demo-styles.css")
 @CssImport(value = "./styles/demo-slide-tab-styles.css", themeFor = "slide-tab")
-@Route("")
+@Route("demo")
 @Theme(value = Lumo.class, variant = Lumo.DARK)
 public class DemoView extends Div {
 

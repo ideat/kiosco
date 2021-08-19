@@ -47,9 +47,7 @@ public class PaymentPlanService {
         firstDetail.setInstallmentNumber(0);
         firstDetail.setPrincipal(0.0);
         firstDetail.setInterest(0.0);
-        firstDetail.setGeneral(0.0);
-        firstDetail.setSecure(0.0);
-        firstDetail.setOther(0.0);
+        firstDetail.setFee(0.0);
         firstDetail.setCharge(0.0);
         firstDetail.setTotal(0.0);
         firstDetail.setBalance(balance);
@@ -63,10 +61,14 @@ public class PaymentPlanService {
             dto.setInstallmentNumber(p.getPrppgnpag());
             dto.setPrincipal(p.getPrppgcapi());
             dto.setInterest(p.getPrppginte());
-            dto.setGeneral(p.getPrppggral());
-            dto.setSecure(p.getPrppgsegu());
-            dto.setOther(p.getPrppgotro());
-            dto.setCharge(p.getPrppgcarg());
+            dto.setFee(p.getPrppgcapi() + p.getPrppginte());
+            Double prppgcarg = p.getPrppgcarg() !=null ?p.getPrppgcarg():0.0;
+            Double prppggral = p.getPrppggral()!=null? p.getPrppggral():0.0;
+            Double prppgsegu = p.getPrppgsegu()!=null?p.getPrppgsegu():0.0;
+            Double prppgotro = p.getPrppgotro()!=null?p.getPrppgotro():0.0;
+
+
+            dto.setCharge(prppgcarg + prppggral + prppgsegu + prppgotro);
             dto.setTotal(p.getPrppgtota());
             balance = balance - p.getPrppgcapi();
             dto.setBalance(balance);
@@ -84,12 +86,12 @@ public class PaymentPlanService {
        auxList.sort(Comparator.comparing(DeferredPaymentPlan::getPrdipfreg));
 
 
-
+        int i = 0;
         for(DeferredPaymentPlan d: auxList){
             DeferredPaymentPlanDto dto = new DeferredPaymentPlanDto();
 
-            dto.setRegisterDate(d.getPrdipfreg());
-            dto.setPaymentDate(d.getPrdipfpag());
+            dto.setDeferredDate(d.getPrdipfreg());
+            dto.setExpireDate(d.getPrdipfpag());
             Double principal = deferredPaymentPlanList.stream()
                     .filter(f -> f.getPrdipfreg().equals(d.getPrdipfreg()) && (f.getPrdipcarg().equals(420) ||
                             f.getPrdipcarg().equals(421) || f.getPrdipcarg().equals(424) || f.getPrdipcarg().equals(425)))
@@ -98,9 +100,13 @@ public class PaymentPlanService {
                     .filter(f -> f.getPrdipfreg().equals(d.getPrdipfreg()) && (f.getPrdipcarg().equals(422) ||
                             f.getPrdipcarg().equals(423) || f.getPrdipcarg().equals(426) || f.getPrdipcarg().equals(427)))
                     .mapToDouble(DeferredPaymentPlan::getPrdipcuot).sum();
+            i+=1;
+            dto.setSecuence(i);
             dto.setPrincipal(principal);
             dto.setInterest(interest);
+            dto.setFee(principal + interest);
             dto.setTotal(principal + interest);
+            dto.setCharge(0.0);
             dto.setIsPayment(d.getPrdipmpag());
 
             deferredPaymentPlanDtoList.add(dto);

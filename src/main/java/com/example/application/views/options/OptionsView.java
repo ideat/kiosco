@@ -24,8 +24,7 @@ import org.vaadin.erik.SlideTabPosition;
 import java.util.Arrays;
 
 @PageTitle("Opciones")
-@Route(value = "kiosco")
-@RouteAlias(value = "uno")
+@Route(value = "uno")
 @Theme(value = Lumo.class, variant = Lumo.DARK)
 public class OptionsView extends Div {
     private static final String BACKGROUND = "hsla(%s, 100%%, 50%%, 0.8)";

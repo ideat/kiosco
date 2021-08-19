@@ -2,6 +2,8 @@ package com.example.application.views.util;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -27,6 +29,29 @@ public class UIUtils {
             component.getElement().setAttribute("colspan",
                     Integer.toString(span));
         }
+    }
+
+    public static void setTextColor(TextColor textColor, Component... components) {
+        for (Component component : components) {
+            component.getElement().getStyle().set("color", textColor.getValue());
+        }
+    }
+
+    public static Icon createPrimaryIcon(VaadinIcon icon) {
+        Icon i = new Icon(icon);
+        setTextColor(TextColor.PRIMARY, i);
+        return i;
+    }
+    public static Icon createSecondaryIcon(VaadinIcon icon) {
+        Icon i = new Icon(icon);
+        setTextColor(TextColor.SECONDARY, i);
+        return i;
+    }
+
+    public static Icon createErrorIcon(VaadinIcon icon) {
+        Icon i = new Icon(icon);
+        setTextColor(TextColor.ERROR, i);
+        return i;
     }
 
     public static String formatAmount(Double amount) {

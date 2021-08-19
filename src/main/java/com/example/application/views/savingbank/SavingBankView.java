@@ -11,11 +11,13 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class SavingBankView {
+public class SavingBankView extends VerticalLayout {
     @Autowired
     private SavingBankService savingBankService;
 
@@ -33,30 +35,38 @@ public class SavingBankView {
     private List<SavingBankClient> savingBankClientList;
 
 
+
     public VerticalLayout getLayoutSavingBank(Integer codeClient){
         VerticalLayout layout = new VerticalLayout();
+        layout.getElement().getStyle().set("background-image","url('/backgrounds/savingbank.png')" );
 
 
-        Button btnTariff = new Button("Tarifario");
-        btnTariff.addClassName("button-font-trf");
+        Button btnTariff = new Button(new Image("/buttons/Boton-07.png","Tarifario"));
+        btnTariff.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+//        btnTariff.addClassName("button-font-trf");
 
-        FlexLayout header = new FlexLayout();
+        VerticalLayout header = new VerticalLayout();
         header.add(btnTariff);
-        header.setAlignContent(FlexLayout.ContentAlignment.SPACE_BETWEEN);
-        header.setFlexDirection(FlexLayout.FlexDirection.COLUMN);
-        header.setSizeFull();
+//        header.setAlignContent(FlexLayout.ContentAlignment.START);
+//        header.setFlexDirection(FlexLayout.FlexDirection.COLUMN);
+        header.setAlignItems(Alignment.BASELINE);
+//        header.setSizeFull();
 
         btnTariff.addClickListener(click -> {
 
         });
 
+        VerticalLayout space = new VerticalLayout();
+        space.setHeight("200px");
 
         savingBankClientList = savingBankService.getSavingBankClient(codeClient);
         VerticalLayout lSavingBank = createSavingBankClient();
-        layout.add(header, lSavingBank);
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        layout.setSpacing(true);
-        layout.setWidth("60%");
+        layout.add(space,header, lSavingBank);
+        layout.setAlignItems(FlexComponent.Alignment.BASELINE);
+        layout.setHorizontalComponentAlignment(Alignment.BASELINE,lSavingBank);
+
+        layout.setSizeFull();
+
 
 
         return layout;
@@ -66,9 +76,9 @@ public class SavingBankView {
 
     private VerticalLayout createSavingBankClient(){
         VerticalLayout layoutGrid = new VerticalLayout();
-
-        H2 title = new H2("CAJAS DE AHORRO");
-        title.addClassName("title-header");
+//
+//        H2 title = new H2("CAJAS DE AHORRO");
+//        title.addClassName("title-header");
 
         Grid<SavingBankClient> grid = new Grid<>();
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
@@ -101,11 +111,13 @@ public class SavingBankView {
         grid.addColumn(new ComponentRenderer<>(this::createButtonSavingBank))
                 .setFlexGrow(0)
                 .setAutoWidth(true);
-//        grid.setWidth("70%");
 
-        layoutGrid.add(title,grid);
-        layoutGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
-//        layoutGrid.setWidth("70%");
+        grid.setHeightByRows(true);
+        grid.setWidth("65%");
+
+        layoutGrid.add(grid);
+        layoutGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.AUTO);
+        layoutGrid.setWidth("90%");
         return layoutGrid;
     }
 

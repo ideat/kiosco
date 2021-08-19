@@ -14,6 +14,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -51,17 +52,20 @@ public class DpfView {
 
     public VerticalLayout getLayoutDpfAccount(Integer codeClient){
         VerticalLayout layout = new VerticalLayout();
+        layout.getElement().getStyle().set("background-image","url('/backgrounds/dpf.png')" );
 
         List<ProductRateTermAmount> listParams = productRateTermAmountService.findAll();
 
-        Button btnTariff = new Button("Tarifario");
-        btnTariff.addClassName("button-font-trf");
+        Button btnTariff = new Button(new Image("/buttons/Boton-07.png","Tarifario"));
+//        btnTariff.addClassName("button-font-trf");
+        btnTariff.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnTariff.addClickListener(click -> {
 
         });
 
-        Button btnSimulation = new Button("Simulación");
-        btnSimulation.addClassName("button-font-trf");
+        Button btnSimulation = new Button(new Image("/buttons/Botones-08.png","Simulacion"));
+        btnSimulation.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+//        btnSimulation.addClassName("button-font-trf");
         btnSimulation.addClickListener(click ->{
             DialogSimulation dialogSimulation = new DialogSimulation(listParams);
             dialogSimulation.open();
@@ -70,17 +74,18 @@ public class DpfView {
         HorizontalLayout header = new HorizontalLayout();
         header.add(btnTariff, btnSimulation);
         header.setSpacing(true);
-//        header.setAlignContent(FlexLayout.ContentAlignment.SPACE_AROUND);
-//        header.setFlexDirection(FlexLayout.FlexDirection.ROW);
-        header.setWidthFull();
 
 
+        VerticalLayout space = new VerticalLayout();
+        space.setHeight("190px");
+        VerticalLayout space2 = new VerticalLayout();
+        space2.setHeight("30px");
         dpfAccountsList = dpfAccountService.getDpfsByClient(codeClient);
-        layout.add(header,createDpfAccountClient());
+        layout.add(space,header,space2,createDpfAccountClient());
 
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setAlignItems(FlexComponent.Alignment.END);
         layout.setSpacing(true);
-        layout.setWidthFull();
+        layout.setSizeFull();
 
 
         return layout;
@@ -89,8 +94,8 @@ public class DpfView {
     private VerticalLayout createDpfAccountClient(){
         VerticalLayout layoutGrid = new VerticalLayout();
 
-        H2 title = new H2("DEPOPSITOS A PLAZO FIJO");
-        title.addClassName("title-header");
+//        H2 title = new H2("DEPOPSITOS A PLAZO FIJO");
+//        title.addClassName("title-header");
 
         Grid<DpfAccounts> grid = new Grid<>();
         grid.addThemeVariants(GridVariant.LUMO_COMPACT);
@@ -127,10 +132,11 @@ public class DpfView {
         grid.addColumn(new ComponentRenderer<>(this::createButtonState))
                 .setFlexGrow(0)
                 .setAutoWidth(true);
+        grid.setHeightByRows(true);
 
-        layoutGrid.add(title,grid);
+        layoutGrid.add(grid);
         layoutGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
-        layoutGrid.setWidth("80%");
+        layoutGrid.setWidth("70%");
         return layoutGrid;
     }
 

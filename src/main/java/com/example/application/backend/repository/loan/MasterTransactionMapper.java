@@ -14,6 +14,7 @@ public interface MasterTransactionMapper {
             " from prhtr " +
             " where prhtrnpre = #{loanNumber} " +
             " and prhtrglos is null " +
+            " and prhtrmrcb = 0" +
             " order by prhtrftra ")
     List<MasterTransaction> findMasterTransactionByLoanNumber(@Param("loanNumber") Integer loanNumber);
 }
