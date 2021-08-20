@@ -1,6 +1,7 @@
 package com.example.application.backend.rest;
 
 import com.example.application.backend.entity.autoform.Forms;
+import com.example.application.backend.entity.autoform.Parameter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,6 +9,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class AutoFormService {
@@ -37,5 +41,13 @@ public class AutoFormService {
 
         return response.getBody();
 
+    }
+
+    public List<Parameter> findFromKioscoAllActive() {
+        final String uri = url+"/parameter/findFromKioscoAll";
+        HttpEntity<Parameter[]> entity = new HttpEntity<>(new HttpHeaders());
+        ResponseEntity<Parameter[]> response = restTemplate.exchange(uri, HttpMethod.GET,entity,Parameter[].class);
+
+        return Arrays.asList(response.getBody());
     }
 }

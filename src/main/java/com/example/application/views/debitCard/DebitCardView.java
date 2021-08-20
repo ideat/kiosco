@@ -1,4 +1,4 @@
-package com.example.application.views.digitalbank;
+package com.example.application.views.debitCard;
 
 import com.example.application.backend.entity.autoform.AccountServiceOperation;
 import com.example.application.backend.entity.autoform.Forms;
@@ -26,18 +26,18 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class DigitalBankView {
+public class DebitCardView {
 
     @Autowired
     private AutoFormService autoFormService;
 
-    public VerticalLayout getLayoutDigitalBank(Integer codeClient){
+    public VerticalLayout getLayoutDebitCard(Integer codeClient){
 
-        Button btnCreateRequest = new Button(new Image("/buttons/Botones-09.png","Solicitar Banca Digital"));
+        Button btnCreateRequest = new Button(new Image("/buttons/Botones-10.png","Solicitar Tarjeta de Debito"));
         btnCreateRequest.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnCreateRequest.setWidthFull();
         VerticalLayout layout = new VerticalLayout();
-        layout.getElement().getStyle().set("background-image","url('/backgrounds/digitalbank.png')" );
+        layout.getElement().getStyle().set("background-image","url('/backgrounds/debitcard.png')" );
 
         VerticalLayout space = new VerticalLayout();
         space.setHeight("300px");
@@ -49,35 +49,26 @@ public class DigitalBankView {
         layout2.setAlignItems(FlexComponent.Alignment.CENTER);
 //        layout2.setWidth("400px");
         layout.add(space,layout2);
-        layout.setHorizontalComponentAlignment(FlexComponent.Alignment.START,layout2);
+        layout.setHorizontalComponentAlignment(FlexComponent.Alignment.END,layout2);
         layout.setSizeFull();
 
         btnCreateRequest.addClickListener(click -> {
-           Forms forms = autoFormService.findFromKioscoByIdClientAndTypeFormAndCategoryTypeForm(codeClient,"BANCA DIGITAL","VARIOS");
-           if (forms.getId()==null){
-               Forms newForm = new Forms();
-               newForm.setIdClient(codeClient);
-               newForm.setNameTypeForm("BANCA DIGITAL");
-               newForm.setCategoryTypeForm("VARIOS");
-               newForm.setAccountServiceOperation(createAccountServiceOperation());
-               autoFormService.create(newForm);
-               Notification notification = new Notification();
-               notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-               Span label = new Span("Solicitud creada, pase por Plataforma para Firmar");
-               notification.add(label);
-               notification.setDuration(6000);
-               notification.setPosition(Notification.Position.MIDDLE);
-               notification.open();
-           }else{
-               Notification notification = new Notification();
-               notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST,NotificationVariant.LUMO_SUCCESS);
-               Span label = new Span("Ya cuenta con el servicio de Banca Digital, puede pasar por Plataforma");
-               label.addClassName("text-color");
-               notification.add(label);
-               notification.setDuration(6000);
-               notification.setPosition(Notification.Position.MIDDLE);
-               notification.open();
-           }
+//            Forms forms = autoFormService.findFromKioscoByIdClientAndTypeFormAndCategoryTypeForm(codeClient,"SERVICIOS TD","VARIOS");
+//            if (forms.getId()==null){
+                Forms newForm = new Forms();
+                newForm.setIdClient(codeClient);
+                newForm.setNameTypeForm("SERVICIOS TD");
+                newForm.setCategoryTypeForm("VARIOS");
+                newForm.setAccountServiceOperation(createAccountServiceOperation());
+                autoFormService.create(newForm);
+                Notification notification = new Notification();
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                Span label = new Span("Solicitud creada, pase por plataforma para firmar");
+                notification.add(label);
+                notification.setDuration(6000);
+                notification.setPosition(Notification.Position.MIDDLE);
+                notification.open();
+//            }
         });
 
         return layout;
@@ -90,7 +81,7 @@ public class DigitalBankView {
         accountServiceOperation.setCreateDate(Util.formatDate(currentDate, "dd/MM/yyyy"));
         accountServiceOperation.setDeliverDate(null);
         accountServiceOperation.setHourCreate(null);
-        accountServiceOperation.setServices(fillNewServicesAndOperations());
+        accountServiceOperation.setServices(fillNewServices());
         accountServiceOperation.setReasonOpening("");
         accountServiceOperation.setExtensionAmount(0.0);
         accountServiceOperation.setDecreaseAmount(0.0);
@@ -110,13 +101,12 @@ public class DigitalBankView {
 
     }
 
-    private String fillNewServicesAndOperations()  {
+    private String fillNewServices()  {
         List<Parameter> parameterList= autoFormService.findFromKioscoAllActive();
         List<Service> serviceList = new ArrayList<>();
         for(Parameter parameter : parameterList){
             Service s = new Service();
-            if(parameter.getCategory().equals("BANCA DIGITAL, SERVICIOS") ||
-                    parameter.getCategory().equals("BANCA DIGITAL, OPERACIONES")){
+            if(parameter.getCategory().equals("TARJETA DEBITO, SERVICIOS") ){
                 s.setName(parameter.getName());
                 s.setChecked("NO");
                 s.setCategory(parameter.getCategory());

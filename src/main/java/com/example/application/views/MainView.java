@@ -1,5 +1,6 @@
 package com.example.application.views;
 
+import com.example.application.views.debitCard.DebitCardView;
 import com.example.application.views.digitalbank.DigitalBankView;
 import com.example.application.views.dpf.DpfView;
 import com.example.application.views.loan.LoanView;
@@ -56,6 +57,9 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
 
     @Autowired
     private DigitalBankView digitalBankView;
+
+    @Autowired
+    private DebitCardView debitCardView;
 
     private Button btnSavingBank;
     private Button btnDpf;
@@ -123,12 +127,19 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
         layoutDigitalBank.setSizeFull();
         layoutDigitalBank.setAlignItems(Alignment.START);
 
+        //Debit Card
+        VerticalLayout layoutDebitCard = createSimpleDiv(5);
+        layoutDebitCard.add(debitCardView.getLayoutDebitCard(63718));
+        layoutDebitCard.setSizeFull();
+        layoutDebitCard.setAlignItems(Alignment.END);
+
         layoutMenu.add(menuLayout());
         carousel.add(layoutMenu);
         carousel.add(layoutSavingBank);
         carousel.add(layoutDpf);
         carousel.add(layoutLoan);
         carousel.add(layoutDigitalBank);
+        carousel.add(layoutDebitCard);
 
 //        carousel.add(new Button("CANCELAR"));
 
@@ -216,6 +227,7 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
         btnDebitCard.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnDebitCard.setWidth("380px");
         btnDebitCard.setHeight("100px");
+        btnDebitCard.addClickListener(click -> carousel.show(5));
 //        btnDebitCard.addClassName("button-font");
         
         btnDigitalBank = new Button(new Image("/buttons/Botones-05.png","Caja Ahorro"));
