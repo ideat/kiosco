@@ -1,11 +1,15 @@
 package com.example.application.views;
 
+import com.example.application.backend.service.client.IdimgService;
 import com.example.application.views.debitCard.DebitCardView;
 import com.example.application.views.digitalbank.DigitalBankView;
 import com.example.application.views.dpf.DpfView;
 import com.example.application.views.loan.LoanView;
 import com.example.application.views.savingbank.SavingBankView;
-import com.helger.commons.state.ICloseable;
+import com.example.application.views.verifyIdCard.VerifyIdCardView;
+import com.flowingcode.vaadin.addons.carousel.Carousel;
+import com.flowingcode.vaadin.addons.carousel.Slide;
+import com.vaadin.componentfactory.IdleNotification;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
@@ -18,23 +22,21 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.page.Viewport;
+import com.vaadin.flow.function.DeploymentConfiguration;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.server.InitialPageSettings;
 import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.server.PageConfigurator;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
-import de.mekaso.vaadin.addons.Carousel;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.awt.*;
-import java.io.IOException;
-import java.util.Collection;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Logger;
+
+//import de.mekaso.vaadin.addons.Carousel;
 
 @PageTitle("Opciones")
 @Route("")
@@ -42,7 +44,7 @@ import java.util.Map;
 @CssImport("./styles/styles.css")
 @PWA(name = "Kiosco UI", shortName = "Kiosco UI", iconPath = "images/logo-18.png", backgroundColor = "#5074a4", themeColor = "#5074a4")
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
-public class MainView extends VerticalLayout implements RouterLayout, HasUrlParameter<String> {
+public class MainView extends VerticalLayout implements  RouterLayout, HasUrlParameter<String> { //, SessionInitListener, SessionDestroyListener {
 
     private static final String BACKGROUND = "hsla(%s, 100%%, 50%%, 0.8)";
 
@@ -61,6 +63,12 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
     @Autowired
     private DebitCardView debitCardView;
 
+    @Autowired
+    private VerifyIdCardView verifyIdCardView;
+
+    @Autowired
+    private IdimgService idimgService;
+
     private Button btnSavingBank;
     private Button btnDpf;
     private Button btnLoan;
@@ -68,78 +76,151 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
     private Button btnDigitalBank;
     private Button btnPersonalData;
 
+    private Button exit;
+
     private Carousel carousel;
 
     private Map<String, List<String>> param;
-
+    private Integer codeClient;
+    public Integer expiredIn=30000;
+    private Image image;
 
     public MainView() {
 
 //       this.getElement().getStyle().set("background-image","url('background.jpg')");
         this.getElement().getStyle().set("background","whitesmoke");
+
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent,  @OptionalParameter String s) {
         VaadinSession.getCurrent()
                 .getSession()
-                .setMaxInactiveInterval(30000);
+                .setMaxInactiveInterval(100);
+
+        IdleNotification idleNotification = new IdleNotification();
+
+        // No. of secs before timeout, at which point the notification is displayed
+        idleNotification.setSecondsBeforeNotification(20);
+        idleNotification.setMessage("Your session will expire in " +
+                IdleNotification.MessageFormatting.SECS_TO_TIMEOUT
+                + " seconds.");
+        idleNotification.addExtendSessionButton("Continuar");
+        idleNotification.setExtendSessionOnOutsideClick(true);
+        idleNotification.addRedirectButton("Salir", "uno");
+        idleNotification.setRedirectAtTimeoutUrl("uno");
+
+        
+        idleNotification.addCloseButton();
+        idleNotification.setExtendSessionOnOutsideClick(false);
+
+        idleNotification.addDetachListener(event -> {
+            if(UI.getCurrent().isClosing()) {
+                VaadinSession.getCurrent().setAttribute("fullname",null);
+                VaadinSession.getCurrent().setAttribute("name",null);
+                VaadinSession.getCurrent().setAttribute("idcard",null);
+                VaadinSession.getCurrent().setAttribute("type-person",null);
+                VaadinSession.getCurrent().setAttribute("nit",null);
+                VaadinSession.getCurrent().setAttribute("codeclient",null);
+
+                UI.getCurrent().getPage().executeJs("javascript:window.close('','_parent','');");
+
+            }
+        });
+
+        UI.getCurrent().add(idleNotification);
+
 
         Location location = beforeEvent.getLocation();
         QueryParameters qp =  location.getQueryParameters();
         param = qp.getParameters();
+        VaadinSession.getCurrent().setAttribute("fullname",param.get("fullname").get(0));
+        VaadinSession.getCurrent().setAttribute("name",param.get("name").get(0));
+        VaadinSession.getCurrent().setAttribute("idcard",param.get("idcard").get(0));
+        VaadinSession.getCurrent().setAttribute("type-person",param.get("type-person").get(0));
+        VaadinSession.getCurrent().setAttribute("nit",param.get("nit").get(0));
+        VaadinSession.getCurrent().setAttribute("codeclient",param.get("codeclient").get(0));
 
+        codeClient = Integer.parseInt(param.get("codeclient").get(0));
 
     }
     
     @Override
     protected void onAttach(AttachEvent attachEvent){
+        Logger logger = Logger.getLogger(MainView.class.getName());
         super.setAlignItems(FlexComponent.Alignment.CENTER);
         super.setHeightFull();
-        carousel = Carousel.create();
-        carousel.setWidth("1500px");
-        carousel.setHeight("800px");
+        DeploymentConfiguration deployConf = VaadinSession.getCurrent().getConfiguration();
+        int hbi =deployConf.getHeartbeatInterval();
+        boolean killIdle = deployConf.isCloseIdleSessions();
+        logger.info(String.format("Deployment Config >> KillIdleSessions : %s -- HeartBeatInterval : %s", killIdle, hbi));
+
+//        carousel = Carousel.create();
+//        carousel.setWidth("1600px");
+//        carousel.setHeight("800px");
 
         //Layout SavingBank
         VerticalLayout layoutSavingBank = createSimpleDiv(5);
-        layoutSavingBank.add(savingBankView.getLayoutSavingBank(26907));
+        layoutSavingBank.add(savingBankView.getLayoutSavingBank(codeClient));
         layoutSavingBank.setSizeFull();
         layoutSavingBank.setAlignItems(Alignment.BASELINE);
 
 
         //Layout DPF
         VerticalLayout layoutDpf = createSimpleDiv(5);
-        layoutDpf.add(dpfView.getLayoutDpfAccount(3155));
+        layoutDpf.add(dpfView.getLayoutDpfAccount(codeClient));
         layoutDpf.setAlignItems(Alignment.END);
         layoutDpf.setSizeFull();
 
         //Layout Loan
         VerticalLayout layoutLoan = createSimpleDiv(5);
         layoutLoan.setSizeFull();
-        layoutLoan.add(loanView.getLayoutLoanAccounts(27459));
+        layoutLoan.add(loanView.getLayoutLoanAccounts(codeClient));
         layoutLoan.setAlignItems(Alignment.END);
 
         VerticalLayout layoutMenu = createSimpleDiv(5);
 
         //Digital Bank
         VerticalLayout layoutDigitalBank = createSimpleDiv(5);
-        layoutDigitalBank.add(digitalBankView.getLayoutDigitalBank(63718));
+        layoutDigitalBank.add(digitalBankView.getLayoutDigitalBank(codeClient));
         layoutDigitalBank.setSizeFull();
         layoutDigitalBank.setAlignItems(Alignment.START);
 
         //Debit Card
         VerticalLayout layoutDebitCard = createSimpleDiv(5);
-        layoutDebitCard.add(debitCardView.getLayoutDebitCard(63718));
+        layoutDebitCard.add(debitCardView.getLayoutDebitCard(codeClient));
         layoutDebitCard.setSizeFull();
         layoutDebitCard.setAlignItems(Alignment.END);
 
+        //Verification IdCard
+        VerticalLayout layoutVerifyIdCard = createSimpleDiv(5);
+        layoutVerifyIdCard.add(verifyIdCardView.getLayoutVerifyIdCard(codeClient));
+        layoutVerifyIdCard.setSizeFull();
+        layoutVerifyIdCard.setAlignItems(Alignment.START);
+
         layoutMenu.add(menuLayout());
-        carousel.add(layoutMenu);
-        carousel.add(layoutSavingBank);
-        carousel.add(layoutDpf);
-        carousel.add(layoutLoan);
-        carousel.add(layoutDigitalBank);
-        carousel.add(layoutDebitCard);
+//        carousel.add(layoutMenu);
+//        carousel.add(layoutSavingBank);
+//        carousel.add(layoutDpf);
+//        carousel.add(layoutLoan);
+//        carousel.add(layoutDigitalBank);
+//        carousel.add(layoutDebitCard);
+//        carousel.add(layoutVerifyIdCard);
+
+        Slide slideMenu = new Slide(layoutMenu);
+        Slide slideSavingBank = new Slide(layoutSavingBank);
+        Slide slideDpf = new Slide(layoutDpf);
+        Slide slideLoan = new Slide(layoutLoan);
+        Slide slideDigitalBank = new Slide(layoutDigitalBank);
+        Slide slideDebitCard = new Slide(layoutDebitCard);
+        Slide slideVerifyIdCard = new Slide(layoutVerifyIdCard);
+
+        carousel = new Carousel(slideMenu,slideSavingBank,slideDpf,slideLoan,slideDigitalBank,slideDebitCard,slideVerifyIdCard)
+                .withSlideDuration(1000);
+        carousel.setWidth("1600px");
+        carousel.setHeight("800px");
+        carousel.setHideNavigation(true);
+        carousel.setDisableSwipe(true);
 
 //        carousel.add(new Button("CANCELAR"));
 
@@ -151,30 +232,33 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
         home.addClickListener(click -> {
 //            Component targetComponent = carousel.getChildren().collect(Collectors.toList()).get(0);
 //            carousel.show(targetComponent);
-            carousel.show(0);
-            if(carousel.getSelectedIndex()!=0){
-                carousel.show(0);
-            }
+//            carousel.show(0);
+//            if(carousel.getSelectedIndex()!=0){
+//                carousel.show(0);
+//            }
+            carousel.movePos(0);
         });
 
-        Button exit = new Button(new Image("/buttons/Botones-20.png","Menu Principal"));
+        exit = new Button(new Image("/buttons/Botones-20.png","Menu Principal"));
         exit.setWidth("380px");
         exit.setHeight("100px");
         exit.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         exit.addClickListener(click -> {
-//            Page.getCurrent().getJavaScript().execute("window.onbeforeunload = function (e) { var e = e || window.event; closeMyApplication(); return; };");
-            Runtime runtime = Runtime.getRuntime();
-            try {
-                runtime.exec("taskkill /IM chrome.exe /F");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            UI.getCurrent().getPage().executeJs("javascript:window.close('','_parent','');");
 
         });
 
+        Button btnTariff = new Button(new Image("/buttons/Botones-13.png","Tarifario completo"));
+        btnTariff.setWidth("380px");
+        btnTariff.setHeight("100px");
+        btnTariff.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnTariff.addClickListener(click -> {
+
+            carousel.movePos(0);
+        });
+
         HorizontalLayout header = new HorizontalLayout();
-        header.add(home,exit);
+        header.add(home,btnTariff,exit);
 
         add(header,carousel);
 
@@ -187,12 +271,26 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
     private HorizontalLayout menuLayout(){
         HorizontalLayout layout = new HorizontalLayout();
         VerticalLayout optionLayout = layoutOptions();
-        layout.add(layoutInfoClient(),optionLayout);
+        HorizontalLayout space = new HorizontalLayout();
+        space.setWidth("90px");
+//        Integer codeClient = Integer.parseInt(param.get("codeclient").get(0));
+//        byte[] imageBytes = idimgService.getImageClient(codeClient);
+//        StreamResource resource = new StreamResource("dummyImageName.jpg", () -> new ByteArrayInputStream(imageBytes));
+//        image = new Image(resource,"picture");
+//        image.setWidth("200px");
+//        image.setHeight("200px");
+//        image.addClassName("rounded-corners");
+//
+//        VerticalLayout layoutImg = new VerticalLayout();
+//        layoutImg.add(image);
+//        layoutImg.setAlignItems(Alignment.START);
+        layout.add(layoutInfoClient(),space,optionLayout);
         layout.setSpacing(true);
         layout.setVerticalComponentAlignment(Alignment.END,optionLayout);
-        layout.setAlignItems(Alignment.START);
+        layout.setAlignItems(Alignment.CENTER);
         layout.getStyle().set("background", "whitesmoke");
         layout.getElement().getStyle().set("background-image","url('/backgrounds/menu.png')");
+        layout.setSizeFull();
 
         return layout;
     }
@@ -205,29 +303,29 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
         btnSavingBank.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnSavingBank.setWidth("380px");
         btnSavingBank.setHeight("100px");
-//        btnSavingBank.addClassName("button-font");
-        btnSavingBank.addClickListener(click -> carousel.show(1));
 
+//        btnSavingBank.addClickListener(click -> carousel.show(1));
+        btnSavingBank.addClickListener(click -> carousel.movePos(1));
 
         btnDpf = new Button(new Image("/buttons/Botones-02.png","DPF"));
         btnDpf.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnDpf.setWidth("380px");
         btnDpf.setHeight("100px");
 //        btnDpf.addClassName("button-font");
-        btnDpf.addClickListener(click -> carousel.show(2));
+        btnDpf.addClickListener(click -> carousel.movePos(2));
         
         btnLoan = new Button(new Image("/buttons/Botones-03.png","Caja Ahorro"));
         btnLoan.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnLoan.setWidth("380px");
         btnLoan.setHeight("100px");
 //        btnLoan.addClassName("button-font");
-        btnLoan.addClickListener(click -> carousel.show(3));
+        btnLoan.addClickListener(click -> carousel.movePos(3));
 
         btnDebitCard = new Button(new Image("/buttons/Botones-04.png","Caja Ahorro"));
         btnDebitCard.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnDebitCard.setWidth("380px");
         btnDebitCard.setHeight("100px");
-        btnDebitCard.addClickListener(click -> carousel.show(5));
+        btnDebitCard.addClickListener(click -> carousel.movePos(5));
 //        btnDebitCard.addClassName("button-font");
         
         btnDigitalBank = new Button(new Image("/buttons/Botones-05.png","Caja Ahorro"));
@@ -235,12 +333,13 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
         btnDigitalBank.setWidth("380px");
         btnDigitalBank.setHeight("100px");
 //        btnDigitalBank.addClassName("button-font");
-        btnDigitalBank.addClickListener(click -> carousel.show(4));
+        btnDigitalBank.addClickListener(click -> carousel.movePos(4));
         
         btnPersonalData = new Button(new Image("/buttons/Botones-06.png","Caja Ahorro"));
         btnPersonalData.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnPersonalData.setWidth("380px");
         btnPersonalData.setHeight("100px");
+        btnPersonalData.addClickListener(click -> carousel.movePos(6));
 //        btnPersonalData.addClassName("button-font");
 
         VerticalLayout layout1 = new VerticalLayout();
@@ -253,28 +352,46 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
     }
 
     private Component layoutInfoClient(){
-        String name = "MARIA JOSE QUINTANILLA";
-        Html intro = new Html(" <H4  style=\"padding-top: 50px; padding-right: 20px; padding-bottom: 20px; padding-left: 500px\"> <p style=\"color:#0D416C;\">Bienvenido </p> </H4> ");
-        Html client = new Html( String.format( " <H4 style=\"padding-top: 0px; padding-right: 20px; padding-bottom: 20px; padding-left: 480px; color:#0D416C;\"> <b>  %s </b> </H4>" ,name));
+        String name = VaadinSession.getCurrent().getAttribute("name").toString();
+//        Html intro = new Html(" <H4  style=\"padding-top: 50px; padding-right: 20px; padding-bottom: 20px; padding-left: 500px\"> <p style=\"color:#0D416C;\">Bienvenido </p> </H4> ");
+        Html client = new Html( String.format( " <H1 style=\"padding-top: 0px; padding-right: 20px; padding-bottom: 130px; padding-left: 250px; color:#004F82;\"> <b>  %s </b> </H1>" ,name));
 //
 //        Html productivity = new Html("<p> <b>Kiosco una manera fácil y conveniente de realizar tus consultas de saldo y estado de cuenta, " +
 //                "efectuar transferencias entre cuentas nacionales, " +
 //                "pagar tus facturas y obtener información sobre nuestros productos y servicios." +
 //                "En el Kiosco encontrarás la calculadora financiera para modelar tu próximo crédito y calcular el rendimiento de tus inversiones futuras.</b></p>");
+        Div space = new Div();
+        space.setHeight("1px");
+        space.setMaxHeight("1px");
+
+        Integer codeClient = Integer.parseInt(param.get("codeclient").get(0));
+        Optional<byte[]> imageBytes = idimgService.getImageClient(codeClient);
+        StreamResource resource = new StreamResource("dummyImageName.jpg", () -> new ByteArrayInputStream(imageBytes.get()));
+        image = new Image(resource,"picture");
+        image.setWidth("270px");
+        image.setHeight("270px");
+        image.addClassName("rounded-corners");
+
+
+        HorizontalLayout spaceH = new HorizontalLayout();
+        spaceH.setWidth("660px");
+
+        HorizontalLayout layoutImg = new HorizontalLayout();
+        layoutImg.add(spaceH,image);
 
         VerticalLayout infoLayout = new VerticalLayout();
-        infoLayout.add(intro,client);
+        infoLayout.add(client);
 
-        infoLayout.setHorizontalComponentAlignment(Alignment.CENTER,intro,client);
+        infoLayout.setHorizontalComponentAlignment(Alignment.CENTER,client);
 //        infoLayout.setHorizontalComponentAlignment(Alignment.CENTER,client);
         infoLayout.setWidth("940px");
         VerticalLayout layout = new VerticalLayout();
 //        layout.setFlexDirection(FlexDirection.COLUMN);
-        layout.add(infoLayout);
-        layout.setMaxWidth("1050px");
-        layout.setMaxHeight("840px");
+        layout.add(space,layoutImg,infoLayout);
+        layout.setMaxWidth("1600px");
+        layout.setMaxHeight("800px");
         layout.addClassName("text-color");
-//        layout.setAlignContent(ContentAlignment.END);
+        layout.setAlignItems(Alignment.START);
 
         return layout;
     }
@@ -289,4 +406,21 @@ public class MainView extends VerticalLayout implements RouterLayout, HasUrlPara
     }
 
 
+//    @Override
+//    public Element getElement() {
+//        return null;
+//    }
+//
+//    @Override
+//    public void sessionDestroy(SessionDestroyEvent sessionDestroyEvent) {
+//        VaadinSession session = sessionDestroyEvent.getSession();
+//        if(VaadinSession.getCurrent().getAttribute("name")==null){
+//            UI.getCurrent().getPage().executeJs("javascript:window.close('','_parent','');");
+//        }
+//    }
+//
+//    @Override
+//    public void sessionInit(SessionInitEvent sessionInitEvent) throws ServiceException {
+//
+//    }
 }

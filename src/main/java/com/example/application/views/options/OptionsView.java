@@ -1,6 +1,8 @@
 package com.example.application.views.options;
 
 import com.example.application.views.example.DemoView;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
@@ -29,14 +31,20 @@ import java.util.Arrays;
 public class OptionsView extends Div {
     private static final String BACKGROUND = "hsla(%s, 100%%, 50%%, 0.8)";
 
+//    @Override
+//    protected void onAttach(AttachEvent attachEvent){
+//        UI.getCurrent().getPage().executeJs("javascript:window.close('','_parent','');");
+//    }
+
     public OptionsView() {
         Carousel carousel = Carousel.create();
 
 //                .withAutoplay()
 //                .withDuration(5, TimeUnit.SECONDS);
 // adjust the width and height (optionally)
-        carousel.setWidth("1200px");
+//        carousel.setWidth("1200px");
         carousel.setHeight("875px");
+        carousel.setWidthFull();
         TextField textField = new TextField("INGRESE DATOS");
 
 
@@ -67,8 +75,10 @@ public class OptionsView extends Div {
         loginForm.setSizeUndefined();
         loginForm.getStyle().set("background", "black");
         loginForm.setMargin(true);
-        loginForm.add(new TextField("Username"), new PasswordField("Password"), new Button("Login"));
+        Button button = new Button("Login");
+        loginForm.add(new TextField("Username"), new PasswordField("Password"), button );
         loginForm.getStyle().set("border", "1px solid #efefef");
+        button.addClickListener(click -> UI.getCurrent().getPage().executeJs("javascript:window.close('','_parent','');"));
         return loginForm;
     }
 

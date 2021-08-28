@@ -4,6 +4,7 @@ package com.example.application.views.savingbank;
 import com.example.application.backend.entity.savingBank.SavingBankClient;
 import com.example.application.backend.service.savingBank.BalanceSavingBankDtoService;
 import com.example.application.backend.service.savingBank.SavingBankService;
+import com.example.application.views.report.FormReportView;
 import com.example.application.views.util.UIUtils;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -19,13 +20,25 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Component
 public class SavingBankView extends VerticalLayout {
+
+    @Value("${path_tariff}")
+    private String pathTariff;
+
     @Autowired
     private SavingBankService savingBankService;
 
@@ -53,7 +66,16 @@ public class SavingBankView extends VerticalLayout {
 //        header.setSizeFull();
 
         btnTariff.addClickListener(click -> {
-
+            Path path = Paths.get(pathTariff+"ahorro//ahorro.pdf");
+            try {
+                byte[] bFile = Files.readAllBytes(path);
+                InputStream is = new ByteArrayInputStream(bFile);
+                byte[] p = IOUtils.toByteArray(is);
+                FormReportView contentReport = new FormReportView("TARIFARIO", p);
+                contentReport.open();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
         VerticalLayout space = new VerticalLayout();

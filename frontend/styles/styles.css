@@ -19,6 +19,17 @@
     color: midnightblue;
 
 }
+
+.rounded-corners {
+    border-radius: 135px 135px 135px 135px;
+    /*border-color: #0D416C;*/
+    /*border-top-color : #0D416C;*/
+    /*border-style: solid;*/
+    /*width: 300px;*/
+    /*padding: 0.5em;*/
+    /*margin: 0.5em;*/
+    /*bgcolor:white;*/
+}
 /*.backgroundimage {*/
 /*    background: url("frontend/styles/background.jpg") !important;*/
 /*}*/

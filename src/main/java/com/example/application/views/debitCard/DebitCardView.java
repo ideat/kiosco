@@ -5,8 +5,10 @@ import com.example.application.backend.entity.autoform.Forms;
 import com.example.application.backend.entity.autoform.Parameter;
 import com.example.application.backend.entity.autoform.Service;
 import com.example.application.backend.rest.AutoFormService;
+import com.example.application.views.MainView;
 import com.example.application.views.util.Util;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -53,8 +55,10 @@ public class DebitCardView {
         layout.setSizeFull();
 
         btnCreateRequest.addClickListener(click -> {
-//            Forms forms = autoFormService.findFromKioscoByIdClientAndTypeFormAndCategoryTypeForm(codeClient,"SERVICIOS TD","VARIOS");
-//            if (forms.getId()==null){
+
+            Forms forms = autoFormService.findFromKioscoByIdClientAndTypeFormAndCategoryTypeForm(codeClient,
+                    "SERVICIOS TD","VARIOS");
+            if (forms.getId()==null){
                 Forms newForm = new Forms();
                 newForm.setIdClient(codeClient);
                 newForm.setNameTypeForm("SERVICIOS TD");
@@ -68,7 +72,28 @@ public class DebitCardView {
                 notification.setDuration(6000);
                 notification.setPosition(Notification.Position.MIDDLE);
                 notification.open();
-//            }
+            }else{
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    List<AccountServiceOperation> accountServiceOperationList = mapper.readValue(forms.getAccountServiceOperation(),
+                            new TypeReference<List<AccountServiceOperation>>(){});
+                    List<AccountServiceOperation> accountServiceOperation = mapper.readValue(createAccountServiceOperation(),
+                            new TypeReference<List<AccountServiceOperation>>(){});
+                    accountServiceOperationList.add(accountServiceOperation.get(0));
+                    String value = mapper.writeValueAsString(accountServiceOperationList);
+                    forms.setAccountServiceOperation(value);
+                    autoFormService.create(forms);
+                    Span label = new Span("Solicitud creada, pase por plataforma para firmar");
+                    Notification notification = new Notification();
+                    notification.add(label);
+                    notification.setDuration(6000);
+                    notification.setPosition(Notification.Position.MIDDLE);
+                    notification.open();
+
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
         });
 
         return layout;

@@ -161,6 +161,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.flowingcode.addons.carousel</groupId>
+            <artifactId>carousel-addon</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.vaadin.erik</groupId>
             <artifactId>slidetab</artifactId>
             <version>3.0.1</version>
@@ -209,11 +215,37 @@
             <version>1.0.0</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-chrome-driver -->
         <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-chrome-driver</artifactId>
-            <version>3.141.59</version>
+            <groupId>org.vaadin.olli</groupId>
+            <artifactId>browser-opener</artifactId>
+            <version>0.5</version>
+        </dependency>
+
+
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-chrome-driver &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.seleniumhq.selenium</groupId>-->
+<!--            <artifactId>selenium-chrome-driver</artifactId>-->
+<!--            <version>3.141.59</version>-->
+<!--        </dependency>-->
+
+        <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-firefox-driver -->
+<!--        <dependency>-->
+<!--            <groupId>org.seleniumhq.selenium</groupId>-->
+<!--            <artifactId>selenium-firefox-driver</artifactId>-->
+<!--            <version>3.141.59</version>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>com.vaadin.componentfactory</groupId>
+            <artifactId>idle-notification</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.vaadin.addons.cropperjs</groupId>
+            <artifactId>cropperjs</artifactId>
+            <version>1.0.0-Beta</version>
         </dependency>
 
         <!-- Include JUnit 4 support for TestBench and others -->

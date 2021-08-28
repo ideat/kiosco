@@ -3,14 +3,12 @@ package com.example.application.views.loan;
 import com.example.application.backend.entity.loan.LoanAccounts;
 import com.example.application.backend.entity.loan.dto.BalanceLoanDto;
 import com.example.application.backend.entity.loan.dto.PaymentPlanDto;
-import com.example.application.backend.entity.savingBank.SavingBankClient;
 import com.example.application.backend.entity.sec.StageHistoryCreditRequestDto;
 import com.example.application.backend.entity.sec.SummaryCreditRequestStage;
 import com.example.application.backend.rest.SecService;
 import com.example.application.backend.service.loan.BalanceLoanService;
 import com.example.application.backend.service.loan.LoanAccountsService;
 import com.example.application.backend.service.loan.PaymentPlanService;
-import com.example.application.views.dpf.DialogSimulation;
 import com.example.application.views.report.FormReportView;
 import com.example.application.views.util.PrinterReportJasper;
 import com.example.application.views.util.UIUtils;
@@ -19,7 +17,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -79,9 +76,6 @@ public class LoanView {
         HorizontalLayout header = new HorizontalLayout();
         header.add(btnTariff, btnSimulation);
         header.setSpacing(true);
-//        header.setAlignContent(FlexLayout.ContentAlignment.SPACE_AROUND);
-//        header.setFlexDirection(FlexLayout.FlexDirection.ROW);
-//        header.setWidthFull();
 
         ///
         loanAccountsList = loanAccountService.findByCodeClient(codeClient);
@@ -91,12 +85,26 @@ public class LoanView {
 
             if(s.getAssignedUser()==null) s.setAssignedUser("NO ASIGNADO");
             summaryCreditRequestStageList.add(s);
+
         }
 
         VerticalLayout space = new VerticalLayout();
-        space.setHeight("120px");
 
-        layout.add(space,header,createGridLayout(), createGridRequest());
+        if(loanAccountsList.size()==0 &&  summaryCreditRequestStageList.size()==0){
+            space.setHeight("250px");
+            layout.add(space,header);
+        }else if(loanAccountsList.size()>0 &&  summaryCreditRequestStageList.size()==0){
+            space.setHeight("180px");
+            layout.add(space,header,createGridLayout());
+        }else if(loanAccountsList.size()==0 &&  summaryCreditRequestStageList.size()>0){
+            space.setHeight("180px");
+            layout.add(space,header,createGridRequest());
+        }else if(loanAccountsList.size()>0 &&  summaryCreditRequestStageList.size()>0){
+            space.setHeight("120px");
+            layout.add(space,header,createGridLayout(), createGridRequest());
+        }
+
+//        layout.add(space,header,createGridLayout(), createGridRequest());
 
         layout.setAlignItems(FlexComponent.Alignment.END);
         layout.setSpacing(true);

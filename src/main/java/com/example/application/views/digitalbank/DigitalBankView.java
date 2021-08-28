@@ -8,13 +8,13 @@ import com.example.application.backend.rest.AutoFormService;
 import com.example.application.views.util.Util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,21 +36,49 @@ public class DigitalBankView {
         Button btnCreateRequest = new Button(new Image("/buttons/Botones-09.png","Solicitar Banca Digital"));
         btnCreateRequest.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnCreateRequest.setWidthFull();
+
+        Button btnDigitalBank = new Button(new Image("/buttons/Botones-12.png","Solicitar Banca Digital"));
+        btnDigitalBank.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnDigitalBank.setWidthFull();
+
         VerticalLayout layout = new VerticalLayout();
         layout.getElement().getStyle().set("background-image","url('/backgrounds/digitalbank.png')" );
 
-        VerticalLayout space = new VerticalLayout();
-        space.setHeight("300px");
+        VerticalLayout spaceV = new VerticalLayout();
+        spaceV.setHeight("250px");
+        VerticalLayout space2 = new VerticalLayout();
+        space2.setHeight("50px");
 
-        HorizontalLayout layout2 = new HorizontalLayout();
+        VerticalLayout layout2 = new VerticalLayout();
         HorizontalLayout spaceH = new HorizontalLayout();
-        spaceH.setWidth("300px");
-        layout2.add(spaceH,btnCreateRequest);
-        layout2.setAlignItems(FlexComponent.Alignment.CENTER);
-//        layout2.setWidth("400px");
-        layout.add(space,layout2);
-        layout.setHorizontalComponentAlignment(FlexComponent.Alignment.START,layout2);
+        spaceH.setWidth("200px");
+        layout2.add(btnCreateRequest, space2, btnDigitalBank);
+//        layout2.setAlignItems(FlexComponent.Alignment.START);
+//        layout2.setHorizontalComponentAlignment(FlexComponent.Alignment.START,btnCreateRequest,btnDigitalBank);
+        layout2.setSpacing(true);
+
+        HorizontalLayout layout3 = new HorizontalLayout();
+        layout3.add(spaceH,layout2);
+
+        layout.add(spaceV,layout3);
+//        layout.setHorizontalComponentAlignment(FlexComponent.Alignment.START,layout2);
         layout.setSizeFull();
+
+        btnDigitalBank.addClickListener(click -> {
+//            String url = "https://web.bankingly.com/Administration.WebUI/Pages/General/Login.aspx?ID=LaPromotora";
+//            UI.getCurrent().getPage().open(url,"_blank, width=200,height=100");
+//            UI.getCurrent().getPage().executeJs("window.location.href = 'https://web.bankingly.com/Administration.WebUI/Pages/General/Login.aspx?ID=LaPromotora'");
+//            DialogBrowserDigitalBank dialog = new DialogBrowserDigitalBank();
+//            dialog.open();
+
+            UI.getCurrent().getPage().executeJs(" window.open(\"https://web.bankingly.com/Administration.WebUI/Pages/General/Login.aspx?ID=LaPromotora\", \"Banca Digital\", \"top=200,left=500,width=950,height=700\")");
+//            FirefoxBinary binary = new FirefoxBinary(new File("C:\\Program Files\\Mozilla Firefox\\firefox.exe"));
+//            FirefoxProfile profile = new FirefoxProfile();
+//            System.setProperty("webdriver.firefox.bin", "C:\\auto-form\\driver\\geckodriver.exe");
+//            System.setProperty("webdriver.gecko.driver","C:\\auto-form\\driver\\geckodriver.exe");
+//            WebDriver driver = new FirefoxDriver();
+//            driver.get("https://web.bankingly.com/Administration.WebUI/Pages/General/Login.aspx?ID=LaPromotora");
+        });
 
         btnCreateRequest.addClickListener(click -> {
            Forms forms = autoFormService.findFromKioscoByIdClientAndTypeFormAndCategoryTypeForm(codeClient,"BANCA DIGITAL","VARIOS");
