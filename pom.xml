@@ -215,11 +215,11 @@
             <version>1.0.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.vaadin.olli</groupId>
-            <artifactId>browser-opener</artifactId>
-            <version>0.5</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.vaadin.olli</groupId>-->
+<!--            <artifactId>browser-opener</artifactId>-->
+<!--            <version>0.5</version>-->
+<!--        </dependency>-->
 
 
 <!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-chrome-driver &ndash;&gt;-->
@@ -243,9 +243,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.vaadin.addons.cropperjs</groupId>
-            <artifactId>cropperjs</artifactId>
-            <version>1.0.0-Beta</version>
+            <groupId>com.wontlost</groupId>
+            <artifactId>sweet-alert2-vaadin</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
         <!-- Include JUnit 4 support for TestBench and others -->

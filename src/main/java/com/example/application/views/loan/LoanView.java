@@ -24,22 +24,32 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
 import net.sf.jasperreports.engine.JRException;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+//@Theme(value = Lumo.class, variant = Lumo.DARK)
 @Component
 public class LoanView {
+
+    @Value("${path_tariff}")
+    private String pathTariff;
 
     @Autowired
     private LoanAccountsService loanAccountService;
@@ -65,6 +75,16 @@ public class LoanView {
         btnTariff.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnTariff.addClickListener(click -> {
 
+            Path path = Paths.get(pathTariff+"creditos//creditos.pdf");
+            try {
+                byte[] bFile = Files.readAllBytes(path);
+                InputStream is = new ByteArrayInputStream(bFile);
+                byte[] p = IOUtils.toByteArray(is);
+                FormReportView contentReport = new FormReportView("TARIFARIO CREDITOS", p);
+                contentReport.open();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
         Button btnSimulation = new Button(new Image("/buttons/Botones-08.png","Simulacion"));
@@ -120,6 +140,7 @@ public class LoanView {
         title.addClassName("title-header");
 
         Grid<LoanAccounts> grid = new Grid<>();
+        grid.getElement().getThemeList().add(Lumo.DARK);
         grid.setItems(loanAccountsList);
         grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
         grid.addColumn(LoanAccounts::getNumberLoan)

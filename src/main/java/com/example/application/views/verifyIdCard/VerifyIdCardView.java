@@ -17,6 +17,8 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.VaadinSession;
+import com.wontlost.sweetalert2.Config;
+import com.wontlost.sweetalert2.SweetAlert2Vaadin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -70,13 +72,20 @@ public class VerifyIdCardView {
 
             newForm.setIdCardForVerification(createDataIdCardVerification());
             autoFormService.create(newForm);
-            Notification notification = new Notification();
-            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-            Span label = new Span("Solicitud creada, firme el documento");
-            notification.add(label);
-            notification.setDuration(6000);
-            notification.setPosition(Notification.Position.MIDDLE);
-            notification.open();
+//            Notification notification = new Notification();
+//            notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+//            Span label = new Span("Solicitud creada, firme el documento");
+//            notification.add(label);
+//            notification.setDuration(6000);
+//            notification.setPosition(Notification.Position.MIDDLE);
+//            notification.open();
+
+            Config config = new Config();
+            config.setTitle("Información");
+            config.setText("Solicitud creada, firme el documento");
+            config.setIcon("info");
+
+            new SweetAlert2Vaadin(config).open();
 
         });
 

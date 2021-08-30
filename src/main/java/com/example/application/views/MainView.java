@@ -5,6 +5,7 @@ import com.example.application.views.debitCard.DebitCardView;
 import com.example.application.views.digitalbank.DigitalBankView;
 import com.example.application.views.dpf.DpfView;
 import com.example.application.views.loan.LoanView;
+import com.example.application.views.report.FormReportView;
 import com.example.application.views.savingbank.SavingBankView;
 import com.example.application.views.verifyIdCard.VerifyIdCardView;
 import com.flowingcode.vaadin.addons.carousel.Carousel;
@@ -28,9 +29,16 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,11 +50,14 @@ import java.util.logging.Logger;
 @Route("")
 @RouteAlias("kiosco")
 @CssImport("./styles/styles.css")
-@PWA(name = "Kiosco UI", shortName = "Kiosco UI", iconPath = "images/logo-18.png", backgroundColor = "#5074a4", themeColor = "#5074a4")
+//@PWA(name = "Kiosco UI", shortName = "Kiosco UI", iconPath = "images/logo-18.png", backgroundColor = "#5074a4", themeColor = "#5074a4")
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
 public class MainView extends VerticalLayout implements  RouterLayout, HasUrlParameter<String> { //, SessionInitListener, SessionDestroyListener {
 
     private static final String BACKGROUND = "hsla(%s, 100%%, 50%%, 0.8)";
+
+    @Value("${path_tariff}")
+    private String pathTariff;
 
     @Autowired
     private SavingBankView savingBankView;
@@ -82,7 +93,6 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
 
     private Map<String, List<String>> param;
     private Integer codeClient;
-    public Integer expiredIn=30000;
     private Image image;
 
     public MainView() {
@@ -102,17 +112,18 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
 
         // No. of secs before timeout, at which point the notification is displayed
         idleNotification.setSecondsBeforeNotification(20);
-        idleNotification.setMessage("Your session will expire in " +
+        idleNotification.setMessage("Su sesión expirara en " +
                 IdleNotification.MessageFormatting.SECS_TO_TIMEOUT
-                + " seconds.");
-        idleNotification.addExtendSessionButton("Continuar");
+                + " segundos.");
+        idleNotification.addExtendSessionButton("CONTINUAR");
         idleNotification.setExtendSessionOnOutsideClick(true);
-        idleNotification.addRedirectButton("Salir", "uno");
-        idleNotification.setRedirectAtTimeoutUrl("uno");
+        idleNotification.addRedirectButton("SALIR", "expired");
+        idleNotification.setRedirectAtTimeoutUrl("expired");
 
         
         idleNotification.addCloseButton();
         idleNotification.setExtendSessionOnOutsideClick(false);
+
 
         idleNotification.addDetachListener(event -> {
             if(UI.getCurrent().isClosing()) {
@@ -123,25 +134,31 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
                 VaadinSession.getCurrent().setAttribute("nit",null);
                 VaadinSession.getCurrent().setAttribute("codeclient",null);
 
-                UI.getCurrent().getPage().executeJs("javascript:window.close('','_parent','');");
+//                UI.getCurrent().getPage().executeJs("javascript:window.close('','_parent','');");
 
             }
         });
+        Div divNotif = new Div();
+        VerticalLayout v = new VerticalLayout();
+        v.setHeight("50px");
+        divNotif.add(v);
+        divNotif.addClassName("title-header");
 
-        UI.getCurrent().add(idleNotification);
+        if(!UI.getCurrent().isClosing()) {
+            UI.getCurrent().add(divNotif,idleNotification);
 
+            Location location = beforeEvent.getLocation();
+            QueryParameters qp = location.getQueryParameters();
+            param = qp.getParameters();
+            VaadinSession.getCurrent().setAttribute("fullname", param.get("fullname").get(0));
+            VaadinSession.getCurrent().setAttribute("name", param.get("name").get(0));
+            VaadinSession.getCurrent().setAttribute("idcard", param.get("idcard").get(0));
+            VaadinSession.getCurrent().setAttribute("type-person", param.get("type-person").get(0));
+            VaadinSession.getCurrent().setAttribute("nit", param.get("nit").get(0));
+            VaadinSession.getCurrent().setAttribute("codeclient", param.get("codeclient").get(0));
 
-        Location location = beforeEvent.getLocation();
-        QueryParameters qp =  location.getQueryParameters();
-        param = qp.getParameters();
-        VaadinSession.getCurrent().setAttribute("fullname",param.get("fullname").get(0));
-        VaadinSession.getCurrent().setAttribute("name",param.get("name").get(0));
-        VaadinSession.getCurrent().setAttribute("idcard",param.get("idcard").get(0));
-        VaadinSession.getCurrent().setAttribute("type-person",param.get("type-person").get(0));
-        VaadinSession.getCurrent().setAttribute("nit",param.get("nit").get(0));
-        VaadinSession.getCurrent().setAttribute("codeclient",param.get("codeclient").get(0));
-
-        codeClient = Integer.parseInt(param.get("codeclient").get(0));
+            codeClient = Integer.parseInt(param.get("codeclient").get(0));
+        }
 
     }
     
@@ -218,7 +235,7 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
         carousel = new Carousel(slideMenu,slideSavingBank,slideDpf,slideLoan,slideDigitalBank,slideDebitCard,slideVerifyIdCard)
                 .withSlideDuration(1000);
         carousel.setWidth("1600px");
-        carousel.setHeight("800px");
+        carousel.setHeight("810px");
         carousel.setHideNavigation(true);
         carousel.setDisableSwipe(true);
 
@@ -254,7 +271,17 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
         btnTariff.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnTariff.addClickListener(click -> {
 
-            carousel.movePos(0);
+            Path path = Paths.get(pathTariff+"completo//tarifario_completo.pdf");
+            try {
+                byte[] bFile = Files.readAllBytes(path);
+                InputStream is = new ByteArrayInputStream(bFile);
+                byte[] p = IOUtils.toByteArray(is);
+                FormReportView contentReport = new FormReportView("TARIFARIO COMPLETO", p);
+                contentReport.open();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+
         });
 
         HorizontalLayout header = new HorizontalLayout();
@@ -354,7 +381,7 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
     private Component layoutInfoClient(){
         String name = VaadinSession.getCurrent().getAttribute("name").toString();
 //        Html intro = new Html(" <H4  style=\"padding-top: 50px; padding-right: 20px; padding-bottom: 20px; padding-left: 500px\"> <p style=\"color:#0D416C;\">Bienvenido </p> </H4> ");
-        Html client = new Html( String.format( " <H1 style=\"padding-top: 0px; padding-right: 20px; padding-bottom: 130px; padding-left: 250px; color:#004F82;\"> <b>  %s </b> </H1>" ,name));
+        Html client = new Html( String.format( " <p style=\"font-size:55px; padding-top: 0px; padding-right: 0px; padding-bottom: 152px; padding-left: 280px; color:#004F82;\"> <b>  %s </b> </p>" ,name));
 //
 //        Html productivity = new Html("<p> <b>Kiosco una manera fácil y conveniente de realizar tus consultas de saldo y estado de cuenta, " +
 //                "efectuar transferencias entre cuentas nacionales, " +
@@ -374,10 +401,13 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
 
 
         HorizontalLayout spaceH = new HorizontalLayout();
-        spaceH.setWidth("660px");
+        spaceH.setWidth("745px");
 
         HorizontalLayout layoutImg = new HorizontalLayout();
         layoutImg.add(spaceH,image);
+
+        VerticalLayout spaceV = new VerticalLayout();
+        spaceV.setHeight("53px");
 
         VerticalLayout infoLayout = new VerticalLayout();
         infoLayout.add(client);
@@ -387,7 +417,7 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
         infoLayout.setWidth("940px");
         VerticalLayout layout = new VerticalLayout();
 //        layout.setFlexDirection(FlexDirection.COLUMN);
-        layout.add(space,layoutImg,infoLayout);
+        layout.add(spaceV,layoutImg,infoLayout);
         layout.setMaxWidth("1600px");
         layout.setMaxHeight("800px");
         layout.addClassName("text-color");

@@ -135,7 +135,7 @@ public class SavingBankView extends VerticalLayout {
                 .setAutoWidth(true);
 
         grid.setHeightByRows(true);
-        grid.setWidth("65%");
+        grid.setWidth("55%");
 
         layoutGrid.add(grid);
         layoutGrid.setHorizontalComponentAlignment(FlexComponent.Alignment.AUTO);

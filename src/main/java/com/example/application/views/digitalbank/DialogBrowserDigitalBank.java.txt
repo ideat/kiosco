@@ -11,7 +11,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.theme.lumo.Lumo;
-import org.vaadin.olli.BrowserOpener;
 
 @CssImport("./styles/my-dialog.css")
 public class DialogBrowserDigitalBank extends Dialog {
@@ -27,7 +26,7 @@ public class DialogBrowserDigitalBank extends Dialog {
 
     private VerticalLayout content;
     public Footer footer;
-    private BrowserOpener browser;
+
 
 
     public DialogBrowserDigitalBank(){
@@ -83,11 +82,11 @@ public class DialogBrowserDigitalBank extends Dialog {
     private VerticalLayout layoutBrowser(){
         VerticalLayout layout = new VerticalLayout();
         String url = "https://web.bankingly.com/Administration.WebUI/Pages/General/Login.aspx?ID=LaPromotora";
-        browser = new BrowserOpener();
-        browser.setContent(new Button("click this button to open"));
-        browser.setUrl(url);
-
-        layout.add(browser);
+//        browser = new BrowserOpener();
+//        browser.setContent(new Button("click this button to open"));
+//        browser.setUrl(url);
+//
+//        layout.add(browser);
         layout.setSizeFull();
         return layout;
     }

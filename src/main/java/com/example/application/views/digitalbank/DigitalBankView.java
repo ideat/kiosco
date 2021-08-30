@@ -17,6 +17,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.wontlost.sweetalert2.Config;
+import com.wontlost.sweetalert2.SweetAlert2Vaadin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -89,22 +91,21 @@ public class DigitalBankView {
                newForm.setCategoryTypeForm("VARIOS");
                newForm.setAccountServiceOperation(createAccountServiceOperation());
                autoFormService.create(newForm);
-               Notification notification = new Notification();
-               notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
-               Span label = new Span("Solicitud creada, pase por Plataforma para Firmar");
-               notification.add(label);
-               notification.setDuration(6000);
-               notification.setPosition(Notification.Position.MIDDLE);
-               notification.open();
+
+               Config config = new Config();
+               config.setTitle("Información");
+               config.setText("Solicitud creada, pase por plataforma para firmar");
+               config.setIcon("info");
+
+               new SweetAlert2Vaadin(config).open();
            }else{
-               Notification notification = new Notification();
-               notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST,NotificationVariant.LUMO_SUCCESS);
-               Span label = new Span("Ya cuenta con el servicio de Banca Digital, puede pasar por Plataforma");
-               label.addClassName("text-color");
-               notification.add(label);
-               notification.setDuration(6000);
-               notification.setPosition(Notification.Position.MIDDLE);
-               notification.open();
+
+               Config config = new Config();
+               config.setTitle("Información");
+               config.setText("Ya cuenta con el servicio de Banca Digital, puede pasar por Plataforma");
+               config.setIcon("info");
+
+               new SweetAlert2Vaadin(config).open();
            }
         });
 
@@ -117,7 +118,7 @@ public class DigitalBankView {
         Date currentDate = new Date();
         accountServiceOperation.setCreateDate(Util.formatDate(currentDate, "dd/MM/yyyy"));
         accountServiceOperation.setDeliverDate(null);
-        accountServiceOperation.setHourCreate(null);
+        accountServiceOperation.setHourCreate(Util.formatDate(currentDate, "HH:mm"));
         accountServiceOperation.setServices(fillNewServicesAndOperations());
         accountServiceOperation.setReasonOpening("");
         accountServiceOperation.setExtensionAmount(0.0);
