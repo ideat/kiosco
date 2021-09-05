@@ -19,6 +19,10 @@
     color: midnightblue;
 
 }
+.text-status{
+    color: darkred;
+    font-size: small;
+}
 
 .rounded-corners {
     border-radius: 135px 135px 135px 135px;

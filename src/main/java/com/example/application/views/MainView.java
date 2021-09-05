@@ -323,7 +323,14 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
     }
 
     private VerticalLayout layoutOptions(){
-
+        Div space = new Div();
+        space.setHeight("13px");
+        Div space1 = new Div();
+        space1.setHeight("13px");
+        Div space2 = new Div();
+        space2.setHeight("13px");
+        Div space3 = new Div();
+        space3.setHeight("13px");
         btnSavingBank = new Button(new Image("/buttons/Botones-01.png","Caja Ahorro"));
 
 //        btnSavingBank.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_LARGE, ButtonVariant.LUMO_CONTRAST);
@@ -371,7 +378,7 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
 
         VerticalLayout layout1 = new VerticalLayout();
 //        layout1.getStyle().set("background", "whitesmoke");
-        layout1.add(btnSavingBank, btnDpf, btnLoan, btnDebitCard, btnDigitalBank, btnPersonalData);
+        layout1.add(btnSavingBank,space, btnDpf, space1,btnLoan, space2, btnDebitCard, space3,btnDigitalBank);
         layout1.setAlignItems(Alignment.END);
 
         return layout1;

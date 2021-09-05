@@ -16,6 +16,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.theme.lumo.Lumo;
 
@@ -112,39 +113,24 @@ public class DialogSimulation extends Dialog {
         amount.setValue(100.0);
         amount.setClearButtonVisible(true);
         amount.setHasControls(true);
+        amount.setErrorMessage("Monto invalido");
         amount.setWidthFull();
         amount.setRequiredIndicatorVisible(true);
 
-        ComboBox<String> cmbCurrency = new ComboBox<>();
+        Select<String> cmbCurrency = new Select<>();
         cmbCurrency.setItems("Bolivianos","Dolares");
-        cmbCurrency.setRequired(true);
+        cmbCurrency.setEmptySelectionAllowed(false);
         cmbCurrency.setValue("Bolivianos");
         cmbCurrency.setWidthFull();
 
-//        NumberField term = new NumberField();
-//        term.setMin(30.0);
-//        term.setMax(1800.0);
-//        term.setValue(30.0);
-//        term.setClearButtonVisible(true);
-//        term.setHasControls(true);
-//        term.setRequiredIndicatorVisible(true);
-//        term.setWidthFull();
-        ComboBox<Integer> term = new ComboBox<>();
+        Select<Integer> term = new Select<>();
         term.setItems(termSet);
         term.setWidthFull();
-        term.setRequired(true);
+        term.setEmptySelectionAllowed(false);
         term.setPlaceholder("Seleccione Plazo");
 
         FormLayout formLayout = new FormLayout();
 
-
-//        HorizontalLayout layoutProduct = new HorizontalLayout();
-//        layoutProduct.setWidthFull();
-//        layoutProduct.add(cmbProduct);
-//        layoutProduct.setAlignItems(FlexComponent.Alignment.CENTER);
-//        FormLayout.FormItem productItem =   formLayout.addFormItem(layoutProduct,"Elije tu DPF:");
-
-//        UIUtils.setColSpan(2,productItem);
 
         HorizontalLayout layoutAmount = new HorizontalLayout();
         layoutAmount.setSpacing(true);
@@ -168,6 +154,9 @@ public class DialogSimulation extends Dialog {
         btnCalculate.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_LARGE);
 
         btnCalculate.addClickListener(click -> {
+            if(amount.isInvalid()){
+                amount.setInvalid(true);
+            }
             if(layoutResult.isVisible()){
                 layoutResult.removeAll();
             }

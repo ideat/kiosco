@@ -1,6 +1,7 @@
 package com.example.application.views.loan;
 
 import com.example.application.backend.entity.loan.LoanAccounts;
+import com.example.application.backend.entity.sec.kiosco.ProductKiosco;
 import com.example.application.backend.entity.loan.dto.BalanceLoanDto;
 import com.example.application.backend.entity.loan.dto.PaymentPlanDto;
 import com.example.application.backend.entity.sec.StageHistoryCreditRequestDto;
@@ -24,7 +25,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import net.sf.jasperreports.engine.JRException;
 import org.apache.commons.io.IOUtils;
@@ -90,7 +91,9 @@ public class LoanView {
         Button btnSimulation = new Button(new Image("/buttons/Botones-08.png","Simulacion"));
         btnSimulation.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnSimulation.addClickListener(click ->{
-
+            List<ProductKiosco> productKioscoList = secService.getProductKiosco();
+            DialogPaymentPlanSimulation dialogPaymentPlanSimulation = new DialogPaymentPlanSimulation(productKioscoList,secService);
+            dialogPaymentPlanSimulation.open();
         });
 
         HorizontalLayout header = new HorizontalLayout();
@@ -100,7 +103,8 @@ public class LoanView {
         ///
         loanAccountsList = loanAccountService.findByCodeClient(codeClient);
         summaryCreditRequestStageList = new ArrayList<>();
-        List<SummaryCreditRequestStage> auxList = secService.getSummaryByIdCard("5627580BE");
+        String idCard = VaadinSession.getCurrent().getAttribute("idcard").toString();
+        List<SummaryCreditRequestStage> auxList = secService.getSummaryByIdCard(idCard);
         for(SummaryCreditRequestStage s: auxList){
 
             if(s.getAssignedUser()==null) s.setAssignedUser("NO ASIGNADO");

@@ -56,7 +56,7 @@ public class DialogTimeLine extends Dialog {
         getElement().setAttribute("aria-labelledby", "dialog-title");
 
         // Header
-        H2 title = new H2("DETALLA ETAPAS");
+        H2 title = new H2("DETALLE ETAPAS DE LA SOLICITUD");
         title.addClassName("dialog-title");
 
         min = new Button(VaadinIcon.DOWNLOAD_ALT.create());
