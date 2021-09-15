@@ -33,7 +33,7 @@ public class DigitalBankView {
     @Autowired
     private AutoFormService autoFormService;
 
-    public VerticalLayout getLayoutDigitalBank(Integer codeClient){
+    public VerticalLayout getLayoutDigitalBank(Integer codeClient, String urlDigitalBank){
 
         Button btnCreateRequest = new Button(new Image("/buttons/Botones-09.png","Solicitar Banca Digital"));
         btnCreateRequest.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
@@ -72,8 +72,8 @@ public class DigitalBankView {
 //            UI.getCurrent().getPage().executeJs("window.location.href = 'https://web.bankingly.com/Administration.WebUI/Pages/General/Login.aspx?ID=LaPromotora'");
 //            DialogBrowserDigitalBank dialog = new DialogBrowserDigitalBank();
 //            dialog.open();
-
-            UI.getCurrent().getPage().executeJs(" window.open(\"https://web.bankingly.com/Administration.WebUI/Pages/General/Login.aspx?ID=LaPromotora\", \"Banca Digital\", \"top=200,left=500,width=950,height=700\")");
+            String u = String.format(" window.open(\"%s\", \"Banca Digital\", \"top=200,left=500,width=950,height=700\")",urlDigitalBank);
+            UI.getCurrent().getPage().executeJs(u);
 //            FirefoxBinary binary = new FirefoxBinary(new File("C:\\Program Files\\Mozilla Firefox\\firefox.exe"));
 //            FirefoxProfile profile = new FirefoxProfile();
 //            System.setProperty("webdriver.firefox.bin", "C:\\auto-form\\driver\\geckodriver.exe");

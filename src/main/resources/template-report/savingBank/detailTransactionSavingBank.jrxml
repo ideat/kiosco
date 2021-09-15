@@ -63,12 +63,14 @@
 				<reportElement x="102" y="6" width="218" height="12" uuid="b87b576e-8f74-4a14-992c-603b85451b85">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="efbdccc4-bca5-46d6-881b-2824fde9e5a8"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<box>
 					<pen lineWidth="0.25"/>
 				</box>
 				<textElement textAlignment="Left">
 					<font size="8" isBold="true"/>
+					<paragraph leftIndent="3"/>
 				</textElement>
 				<text><![CDATA[DESCRIPCION]]></text>
 			</staticText>
@@ -129,9 +131,11 @@
 				<reportElement x="102" y="0" width="218" height="12" uuid="5feb5192-e03f-46ca-9f3d-4958641b8ce3">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="efbdccc4-bca5-46d6-881b-2824fde9e5a8"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				</reportElement>
 				<textElement>
 					<font size="8"/>
+					<paragraph leftIndent="5"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>

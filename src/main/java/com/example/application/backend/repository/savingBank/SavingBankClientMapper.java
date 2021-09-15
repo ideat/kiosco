@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface SavingBankClientMapper {
-    @Select(" SELECT g.gbagenomb full_name, b.camcancta account, ct.catcadesc product_name,gb.gbconabre currency, (b.camcasact)*-1 balance,c.cacondesc state,     " +
+    @Select(" SELECT distinct g.gbagenomb full_name, b.camcancta account, ct.catcadesc product_name,gb.gbconabre currency, (b.camcasact)*-1 balance,c.cacondesc state,     " +
             "round(decode(b.camcatpca,     " +
             "(select cc.catcatpca     " +
             "from catca cc     " +
@@ -30,8 +30,9 @@ public interface SavingBankClientMapper {
             "                                                                                  from caprp p     " +
             "                                                                                  where p.caprptpca=cc.catcatpca)),d.canidtasa),2) rate     " +
             "                                                                                                                   " +
-            "from camca b, canid d, gbage g, cacon c, catca ct, gbcon gb      " +
-            "where g.gbagecage = b.camcacage     " +
+            "from camca b, canid d, gbage g, cacon c, catca ct, gbcon gb, cafir cf     " +
+            "where g.gbagecage = b.camcacage    " +
+            " and cf.cafirncta = b.camcancta " +
             "and ct.catcatpca = b.camcatpca     " +
             "and c.caconpref = 4 and c.caconcorr = b.camcastat     " +
             "and b.camcatpca = d.canidtpca     " +
@@ -39,7 +40,7 @@ public interface SavingBankClientMapper {
             "and d.canidmrcb = 0      " +
             "and gb.gbconpfij = 5 and gb.gbconcorr = b.camcacmon     " +
             "and b.camcastat in (1,2)     " +
-            "and b.camcacage = #{codeClient} ")
+            "and cf.cafircage = #{codeClient} ")
     List<SavingBankClient> getSavingBanksClient(@Param("codeClient") Integer codeClient);
 
 

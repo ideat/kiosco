@@ -55,6 +55,7 @@
     "lumo-css-framework": "^4.0.10",
     "pure-timeline": "^1.2.0",
     "sweetalert2": "^10.16.0",
+    "video.js": "^7.8.2",
     "web-animations-js": "^2.3.1"
   },
   "devDependencies": {
@@ -136,6 +137,7 @@
       "lumo-css-framework": "^4.0.10",
       "pure-timeline": "^1.2.0",
       "sweetalert2": "^10.16.0",
+      "video.js": "^7.8.2",
       "web-animations-js": "^2.3.1"
     },
     "devDependencies": {
@@ -157,6 +159,6 @@
       "webpack-dev-server": "3.11.0",
       "webpack-merge": "4.2.2"
     },
-    "hash": "7d97d9782429d6ab17d5f2b905887444752e7e11098a29aea36fcf3988c7fec3"
+    "hash": "8910136013197eef8426c7f6f76c9e395b29fcd58c0f682e10719f1660d50933"
   }
 }

@@ -11,7 +11,10 @@ public class EmbeddedPdfDocument extends Component implements HasSize {
     public EmbeddedPdfDocument(StreamResource resource) {
         this();
         getElement().setAttribute("data", resource);
+        getElement().setAttribute("zoom-level","150%");
+
         setSizeFull();
+
     }
 
     public EmbeddedPdfDocument(String url) {
@@ -21,6 +24,10 @@ public class EmbeddedPdfDocument extends Component implements HasSize {
 
     protected EmbeddedPdfDocument() {
         getElement().setAttribute("type", "application/pdf");
+        getElement().setAttribute("zoom-level","150%");
         setSizeFull();
+
+
+
     }
 }

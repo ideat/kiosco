@@ -10,6 +10,7 @@ import com.example.application.views.savingbank.SavingBankView;
 import com.example.application.views.verifyIdCard.VerifyIdCardView;
 import com.flowingcode.vaadin.addons.carousel.Carousel;
 import com.flowingcode.vaadin.addons.carousel.Slide;
+
 import com.vaadin.componentfactory.IdleNotification;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
@@ -59,6 +60,12 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
     @Value("${path_tariff}")
     private String pathTariff;
 
+    @Value("${url_digital_bank}")
+    private String urlDigitalBank;
+
+    @Value("${url_open_account}")
+    private String urlOpenAccount;
+
     @Autowired
     private SavingBankView savingBankView;
 
@@ -86,6 +93,7 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
     private Button btnDebitCard;
     private Button btnDigitalBank;
     private Button btnPersonalData;
+    private Button btnOpenAccount;
 
     private Button exit;
 
@@ -120,10 +128,8 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
         idleNotification.addRedirectButton("SALIR", "expired");
         idleNotification.setRedirectAtTimeoutUrl("expired");
 
-        
         idleNotification.addCloseButton();
         idleNotification.setExtendSessionOnOutsideClick(false);
-
 
         idleNotification.addDetachListener(event -> {
             if(UI.getCurrent().isClosing()) {
@@ -199,7 +205,7 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
 
         //Digital Bank
         VerticalLayout layoutDigitalBank = createSimpleDiv(5);
-        layoutDigitalBank.add(digitalBankView.getLayoutDigitalBank(codeClient));
+        layoutDigitalBank.add(digitalBankView.getLayoutDigitalBank(codeClient,urlDigitalBank));
         layoutDigitalBank.setSizeFull();
         layoutDigitalBank.setAlignItems(Alignment.START);
 
@@ -323,14 +329,14 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
     }
 
     private VerticalLayout layoutOptions(){
-        Div space = new Div();
-        space.setHeight("13px");
-        Div space1 = new Div();
-        space1.setHeight("13px");
-        Div space2 = new Div();
-        space2.setHeight("13px");
-        Div space3 = new Div();
-        space3.setHeight("13px");
+//        Div space = new Div();
+//        space.setHeight("13px");
+//        Div space1 = new Div();
+//        space1.setHeight("13px");
+//        Div space2 = new Div();
+//        space2.setHeight("13px");
+//        Div space3 = new Div();
+//        space3.setHeight("13px");
         btnSavingBank = new Button(new Image("/buttons/Botones-01.png","Caja Ahorro"));
 
 //        btnSavingBank.addThemeVariants(ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_LARGE, ButtonVariant.LUMO_CONTRAST);
@@ -355,7 +361,7 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
 //        btnLoan.addClassName("button-font");
         btnLoan.addClickListener(click -> carousel.movePos(3));
 
-        btnDebitCard = new Button(new Image("/buttons/Botones-04.png","Caja Ahorro"));
+        btnDebitCard = new Button(new Image("/buttons/Botones-04.png","Apertura cuenta"));
         btnDebitCard.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnDebitCard.setWidth("380px");
         btnDebitCard.setHeight("100px");
@@ -368,7 +374,19 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
         btnDigitalBank.setHeight("100px");
 //        btnDigitalBank.addClassName("button-font");
         btnDigitalBank.addClickListener(click -> carousel.movePos(4));
-        
+
+
+        btnOpenAccount = new Button(new Image("/buttons/Botones-15.png","Caja Ahorro"));
+        btnOpenAccount.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnOpenAccount.setWidth("380px");
+        btnOpenAccount.setHeight("100px");
+//        btnDigitalBank.addClassName("button-font");
+        btnOpenAccount.addClickListener(click -> {
+            String u = String.format( "window.open(\"%s\", \"Apertura de cuenta\", \"top=200,left=500,width=950,height=700\")",urlOpenAccount);
+            UI.getCurrent().getPage().executeJs(u);
+//            UI.getCurrent().getPage().executeJs(" window.open(\"https://web.bankingly.com/Administration.WebUI/Pages/General/Login.aspx?ID=LaPromotora\", \"Apertura de cuenta\", \"top=200,left=500,width=950,height=700\")");
+        });
+
         btnPersonalData = new Button(new Image("/buttons/Botones-06.png","Caja Ahorro"));
         btnPersonalData.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnPersonalData.setWidth("380px");
@@ -377,8 +395,9 @@ public class MainView extends VerticalLayout implements  RouterLayout, HasUrlPar
 //        btnPersonalData.addClassName("button-font");
 
         VerticalLayout layout1 = new VerticalLayout();
+        layout1.add(btnSavingBank, btnDpf, btnLoan, btnDebitCard, btnDigitalBank, btnOpenAccount);
 //        layout1.getStyle().set("background", "whitesmoke");
-        layout1.add(btnSavingBank,space, btnDpf, space1,btnLoan, space2, btnDebitCard, space3,btnDigitalBank);
+//        layout1.add(btnSavingBank,space, btnDpf, space1,btnLoan, space2, btnDebitCard, space3,btnDigitalBank);
         layout1.setAlignItems(Alignment.END);
 
         return layout1;

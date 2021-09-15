@@ -118,7 +118,7 @@ public class FormReportView extends Dialog {
         max.setIcon(VaadinIcon.EXPAND_SQUARE.create());
         getElement().getThemeList().remove(FULLSCREEN);
         setHeight("800px");
-        setWidth("800px");
+        setWidth("1200px");
     }
 
     private void maximise() {
