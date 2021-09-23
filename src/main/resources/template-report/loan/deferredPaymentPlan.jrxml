@@ -309,7 +309,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{isPayment}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd/MM/yyyy">
+			<textField>
 				<reportElement x="19" y="0" width="21" height="12" uuid="fa9aff63-0e87-4d15-82e7-017bf31199a1">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="a8f63e52-d7e2-477e-88ec-da93e1e98a56"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
