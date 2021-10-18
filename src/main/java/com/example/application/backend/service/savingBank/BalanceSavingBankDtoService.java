@@ -84,8 +84,10 @@ public class BalanceSavingBankDtoService {
         DetailTransactionSavingBankDto firstRegister = new DetailTransactionSavingBankDto();
         firstRegister.setTransactionDate(null);
         firstRegister.setDescription("Saldo Anterior -------------->");
-        firstRegister.setDebit(initDebit); //initDebit
-        firstRegister.setCredit(initCredit*-1); //initCredit*-1
+//        firstRegister.setDebit(initDebit); //initDebit
+//        firstRegister.setCredit(initCredit*-1); //initCredit*-1
+        firstRegister.setDebit(null); //initDebit
+        firstRegister.setCredit(null); //initCredit*-1
         firstRegister.setBalance(initBalance);
 
         firstRegister.setAmountReserved(headerBalanceSavingBank.getCamcafpig()!=null?headerBalanceSavingBank.getCamcafpig():0.0);

@@ -29,7 +29,7 @@
 		<variableExpression><![CDATA[$F{amountReserved}]]></variableExpression>
 	</variable>
 	<variable name="amountAvailable" class="java.lang.Double">
-		<variableExpression><![CDATA[$V{sumCredit}-$V{sumDebit}-$V{sourceReserved}]]></variableExpression>
+		<variableExpression><![CDATA[($F{balance}*-1)-$V{sourceReserved}]]></variableExpression>
 	</variable>
 	<background>
 		<band splitType="Stretch"/>
@@ -139,7 +139,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;(#,##0.00)">
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement x="320" y="0" width="84" height="12" uuid="d4465bb7-51ff-4aa4-9cba-b903e146db59">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="2f1b1d86-b497-44ca-a4bc-e84b312256c4"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -149,7 +149,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{debit}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0.00;(#,##0.00)">
+			<textField pattern="#,##0.00;(#,##0.00)" isBlankWhenNull="true">
 				<reportElement x="404" y="0" width="84" height="12" uuid="35f05dff-58a8-4765-93ba-facb0ffcaa78">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f40f8227-7d63-40aa-8fde-286b1b8c42bd"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -208,7 +208,7 @@
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{sumCredit}-$V{sumDebit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[($F{balance}*-1)]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00;(#,##0.00)">
 				<reportElement x="488" y="17" width="72" height="12" uuid="5a853d87-9d6f-4a37-9c73-e31eaa1b0b50">
